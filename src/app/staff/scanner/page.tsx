@@ -320,6 +320,43 @@ export default function ScannerPage() {
         aria-hidden="true"
       />
 
+    <div
+  className="scanner-page-decoration"
+  aria-hidden="true"
+>
+  <div className="scanner-page-orbit scanner-page-orbit-left" />
+  <div className="scanner-page-orbit scanner-page-orbit-right" />
+
+  <svg
+    className="scanner-page-lantern"
+    viewBox="0 0 64 112"
+  >
+    <path
+      d="M32 0v12M23 12h18M20 18h24M24 18l-8 16v42l16 21 16-21V34l-8-16M16 39h32M16 72h32M24 39v33M40 39v33M23 82h18M28 97v10h8V97"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+
+  <svg
+    className="scanner-page-crescent"
+    viewBox="0 0 100 100"
+  >
+    <path
+      d="M65 15c-23 5-39 26-35 49 4 24 27 40 51 34-18-5-31-22-31-42 0-17 8-32 22-41-2 0-5 0-7 0Z"
+      fill="currentColor"
+    />
+  </svg>
+
+  <div className="scanner-page-mosque">
+    <span className="scanner-page-mosque-dome" />
+    <span className="scanner-page-mosque-body" />
+    <span className="scanner-page-mosque-minaret" />
+  </div>
+</div>
       <div className="scanner-v3-shell">
 
         {/* HELP BUTTON */}
@@ -337,9 +374,7 @@ export default function ScannerPage() {
 
         {/* HEADER */}
         <header className="scanner-v3-header">
-          <span className="scanner-v3-kicker">
-            Event Check-in
-          </span>
+          
 
           <h1>
             QR Check-in Scanner

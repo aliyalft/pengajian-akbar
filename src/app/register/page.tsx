@@ -7,6 +7,7 @@ import {
 } from 'react';
 
 import { useRouter } from 'next/navigation';
+import IslamicAnimatedBg from '@/components/IslamicAnimatedBg';
 
 type Gender =
   | 'Ikhwan'
@@ -213,9 +214,10 @@ export default function RegisterPage() {
 
   return (
     <main className="register-v2-page islamic-pattern">
+    
 
       <div className="register-v2-shell">
-
+        
 
         {/* ======================
             PAGE TITLE
@@ -1000,7 +1002,7 @@ export default function RegisterPage() {
                       className="form-label"
                       htmlFor="institution"
                     >
-                      Instansi / Komunitas
+                      Jamaah
                     </label>
 
                     <input
@@ -1354,6 +1356,7 @@ export default function RegisterPage() {
           <img
             src="/image/logo-tactlink.png"
             alt="TactLink"
+            className="tactlink-footer-logo"
           />
         </div>
 

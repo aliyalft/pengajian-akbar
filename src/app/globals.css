@@ -7590,7 +7590,204 @@ body {
     );
 }
 
+/* ==================================================
+   SCANNER BACKGROUND DECORATION
+================================================== */
 
+.scanner-page-v3 {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanner-page-decoration {
+  position: absolute;
+  inset: 0;
+
+  z-index: 1;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.scanner-v3-shell {
+  position: relative;
+  z-index: 3;
+}
+
+
+/* ORBIT */
+
+.scanner-page-orbit {
+  position: absolute;
+
+  width: 420px;
+  height: 420px;
+
+  border: 1.5px solid rgba(8, 112, 80, 0.09);
+  border-radius: 50%;
+}
+
+.scanner-page-orbit-left {
+  left: -270px;
+  top: 20%;
+}
+
+.scanner-page-orbit-right {
+  right: -260px;
+  top: -110px;
+
+  border-color: rgba(189, 143, 44, 0.12);
+}
+
+
+/* LANTERN */
+
+.scanner-page-lantern {
+  position: absolute;
+
+  width: 44px;
+
+  left: 7%;
+  top: 7%;
+
+  color: rgba(8, 112, 80, 0.16);
+}
+
+
+/* CRESCENT */
+
+.scanner-page-crescent {
+  position: absolute;
+
+  width: 42px;
+  height: 42px;
+
+  right: 8%;
+  top: 10%;
+
+  color: rgba(189, 143, 44, 0.18);
+}
+
+
+/* MOSQUE */
+
+.scanner-page-mosque {
+  position: absolute;
+
+  width: 180px;
+  height: 145px;
+
+  right: -36px;
+  bottom: 2%;
+
+  color: #087052;
+
+  opacity: 0.08;
+}
+
+.scanner-page-mosque-body {
+  position: absolute;
+
+  left: 25px;
+  right: 25px;
+  bottom: 0;
+
+  height: 70px;
+
+  border: 2px solid currentColor;
+  border-top: 0;
+}
+
+.scanner-page-mosque-dome {
+  position: absolute;
+
+  left: 38px;
+  top: 18px;
+
+  width: 100px;
+  height: 68px;
+
+  border: 2px solid currentColor;
+  border-bottom: 0;
+
+  border-radius: 70px 70px 0 0;
+}
+
+.scanner-page-mosque-minaret {
+  position: absolute;
+
+  left: 5px;
+  bottom: 0;
+
+  width: 17px;
+  height: 105px;
+
+  border: 2px solid currentColor;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 560px) {
+  .scanner-page-orbit {
+    width: 310px;
+    height: 310px;
+  }
+
+  .scanner-page-orbit-left {
+    left: -220px;
+    top: 28%;
+  }
+
+  .scanner-page-orbit-right {
+    right: -210px;
+    top: -90px;
+  }
+
+  .scanner-page-lantern {
+    width: 34px;
+    left: 5%;
+    top: 4%;
+  }
+
+  .scanner-page-crescent {
+    width: 34px;
+    height: 34px;
+
+    right: 6%;
+    top: 7%;
+  }
+
+  .scanner-page-mosque {
+    width: 145px;
+    height: 115px;
+
+    right: -36px;
+    bottom: 1%;
+
+    opacity: 0.07;
+  }
+
+  .scanner-page-mosque-body {
+    left: 20px;
+    right: 20px;
+    height: 56px;
+  }
+
+  .scanner-page-mosque-dome {
+    left: 30px;
+    top: 14px;
+
+    width: 80px;
+    height: 54px;
+  }
+
+  .scanner-page-mosque-minaret {
+    width: 14px;
+    height: 84px;
+  }
+}
 /* ==================================================
    MAIN SCANNER CARD
 ================================================== */
@@ -7637,15 +7834,12 @@ body {
 }
 
 .scanner-v3-card-head h2 {
-  margin: 0;
-
-  font-family:
-    var(--font-heading),
-    serif;
-
-  font-size: 1.9rem;
-
-  color: #075f47;
+  font-family: var(--font-body), sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0b5f47;
 }
 
 .scanner-ready {
@@ -7681,6 +7875,12 @@ body {
   background: #31b77c;
 }
 
+@media (max-width: 560px) {
+  .scanner-v3-card-head h2 {
+    font-size: 1.00rem;
+    line-height: 1.2;
+  }
+}
 
 /* ==================================================
    ACTUAL QR SCANNER
@@ -9512,7 +9712,22 @@ body {
   color: #c5d0ca;
 }
 
+.tactlink-footer-logo {
+  width: 30px;
+  height: 30px;
 
+  object-fit: contain;
+
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(27%)
+    sepia(24%)
+    saturate(1320%)
+    hue-rotate(112deg)
+    brightness(88%)
+    contrast(93%);
+}
 /* ==================================================
    MOBILE
 ================================================== */
@@ -10334,5 +10549,128 @@ body {
 
   .scan-history-drawer-body {
     padding: 14px;
+  }
+}
+
+.islamic-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.islamic-motif {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(14, 116, 81, 0.08);
+  filter: blur(0px);
+}
+
+.islamic-motif svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.motif-a {
+  width: 140px;
+  height: 140px;
+  top: 90px;
+  left: 24px;
+  animation: motifFloatA 8s ease-in-out infinite;
+}
+
+.motif-b {
+  width: 150px;
+  height: 150px;
+  top: 120px;
+  right: 26px;
+  color: rgba(196, 158, 73, 0.10);
+  animation: motifFloatB 9s ease-in-out infinite;
+}
+
+.motif-c {
+  width: 128px;
+  height: 128px;
+  bottom: 120px;
+  left: 18px;
+  animation: motifFloatC 10s ease-in-out infinite;
+}
+
+.motif-d {
+  width: 130px;
+  height: 130px;
+  bottom: 110px;
+  right: 22px;
+  color: rgba(196, 158, 73, 0.09);
+  animation: motifFloatD 11s ease-in-out infinite;
+}
+
+@keyframes motifFloatA {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+@keyframes motifFloatB {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(7px) rotate(-2deg);
+  }
+}
+
+@keyframes motifFloatC {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1.5deg);
+  }
+}
+
+@keyframes motifFloatD {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(6px) rotate(-1.5deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .motif-a {
+    width: 92px;
+    height: 92px;
+    top: 72px;
+    left: 12px;
+  }
+
+  .motif-b {
+    width: 96px;
+    height: 96px;
+    top: 88px;
+    right: 12px;
+  }
+
+  .motif-c {
+    width: 88px;
+    height: 88px;
+    bottom: 96px;
+    left: 8px;
+  }
+
+  .motif-d {
+    width: 90px;
+    height: 90px;
+    bottom: 86px;
+    right: 10px;
   }
 }

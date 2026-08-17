@@ -33,6 +33,9 @@ export default function Html5QrScanner({
   const [starting, setStarting] =
     useState(false);
 
+  const [stopping, setStopping] =
+    useState(false);
+
   const lastScanRef = useRef<{
     value: string;
     time: number;
@@ -63,7 +66,11 @@ export default function Html5QrScanner({
   };
 
   const startCamera = async () => {
-    if (starting || cameraActive) {
+    if (
+      starting ||
+      stopping ||
+      cameraActive
+    ) {
       return;
     }
 
@@ -119,12 +126,64 @@ export default function Html5QrScanner({
         error
       );
 
+      setCameraActive(false);
+
       setCameraError(
         'Kamera tidak dapat digunakan. Izinkan akses kamera lalu coba kembali.'
       );
     } finally {
       setStarting(false);
     }
+  };
+
+  const stopCamera = async () => {
+    if (
+      !scannerRef.current ||
+      !cameraActive ||
+      stopping
+    ) {
+      return;
+    }
+
+    setStopping(true);
+    setCameraError(null);
+
+    try {
+      await scannerRef.current.stop();
+
+      try {
+        scannerRef.current.clear();
+      } catch (clearError) {
+        console.warn(
+          'Clear camera scanner error:',
+          clearError
+        );
+      }
+
+      scannerRef.current = null;
+
+      setCameraActive(false);
+    } catch (error) {
+      console.error(
+        'Stop camera error:',
+        error
+      );
+
+      setCameraError(
+        'Kamera tidak dapat dimatikan. Silakan coba kembali.'
+      );
+    } finally {
+      setStopping(false);
+    }
+  };
+
+  const toggleCamera = async () => {
+    if (cameraActive) {
+      await stopCamera();
+      return;
+    }
+
+    await startCamera();
   };
 
   const handleFile = async (
@@ -157,7 +216,14 @@ export default function Html5QrScanner({
 
       handleDecoded(decodedText);
 
-      await fileScanner.clear();
+      try {
+        fileScanner.clear();
+      } catch (clearError) {
+        console.warn(
+          'Clear file scanner error:',
+          clearError
+        );
+      }
     } catch (error) {
       console.error(
         'File QR error:',
@@ -183,9 +249,9 @@ export default function Html5QrScanner({
         .stop()
         .catch(() => {})
         .finally(() => {
-          scanner
-            .clear()
-            .catch(() => {});
+          try {
+            scanner.clear();
+          } catch {}
         });
     };
   }, []);
@@ -222,18 +288,21 @@ export default function Html5QrScanner({
                   strokeWidth="1.8"
                   strokeLinecap="round"
                 />
+
                 <path
                   d="M16 4H18.5C19.33 4 20 4.67 20 5.5V8"
                   stroke="currentColor"
                   strokeWidth="1.8"
                   strokeLinecap="round"
                 />
+
                 <path
                   d="M20 16V18.5C20 19.33 19.33 20 18.5 20H16"
                   stroke="currentColor"
                   strokeWidth="1.8"
                   strokeLinecap="round"
                 />
+
                 <path
                   d="M8 20H5.5C4.67 20 4 19.33 4 18.5V16"
                   stroke="currentColor"
@@ -259,16 +328,23 @@ export default function Html5QrScanner({
 
       {/* BUTTONS OUTSIDE */}
       <div className="qr-scanner-actions">
+
         <button
           type="button"
-          className="qr-camera-button"
-          onClick={startCamera}
+          className={`qr-camera-button ${
+            cameraActive
+              ? 'is-active'
+              : ''
+          }`}
+          onClick={toggleCamera}
           disabled={
-            starting || cameraActive
+            starting || stopping
           }
         >
           {cameraActive
-            ? 'Kamera Aktif'
+            ? stopping
+              ? 'Mematikan Kamera...'
+              : 'Matikan Kamera'
             : starting
               ? 'Membuka Kamera...'
               : 'Buka Kamera'}
@@ -283,6 +359,7 @@ export default function Html5QrScanner({
         >
           Pilih Gambar QR
         </button>
+
       </div>
 
       <input
