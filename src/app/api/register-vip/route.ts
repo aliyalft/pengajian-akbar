@@ -7,16 +7,23 @@ const REQUIRED_FIELDS = [
   'phoneNumber',
   'email',
   'gender',
+  'jamaahType',
   'city',
-  // REVISI: field baru wajib diisi
   'confirmation',
   'gate',
 ] as const;
 
 const VALID_GENDERS: Gender[] = ['Ikhwan', 'Akhwat'];
 
-// REVISI: daftar nilai valid untuk field baru
+const VALID_JAMAAH_TYPES = [
+  'majelis_taklim',
+  'organisasi',
+  'komunitas',
+  'perorangan',
+] as const;
+
 const VALID_CONFIRMATIONS = ['YA', 'TIDAK'] as const;
+
 const VALID_GATES = ['Surapati', 'Diponegoro'] as const;
 
 export async function POST(request: Request) {
@@ -39,7 +46,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // REVISI: validasi Konfirmasi Kehadiran
+    if (!VALID_JAMAAH_TYPES.includes(body.jamaahType)) {
+      return NextResponse.json(
+        { error: 'Kategori jamaah tidak valid.' },
+        { status: 400 }
+      );
+    }
+
+    // Wajib isi nama Majelis Taklim/Organisasi/Komunitas,
+    // kecuali kategori Perorangan
+    if (
+      body.jamaahType !== 'perorangan' &&
+      (!body.jamaahName || String(body.jamaahName).trim() === '')
+    ) {
+      return NextResponse.json(
+        { error: 'Nama Majelis Taklim/Organisasi/Komunitas wajib diisi.' },
+        { status: 400 }
+      );
+    }
+
     if (!VALID_CONFIRMATIONS.includes(body.confirmation)) {
       return NextResponse.json(
         { error: 'Konfirmasi kehadiran tidak valid.' },
@@ -47,7 +72,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // REVISI: validasi Pintu Masuk
     if (!VALID_GATES.includes(body.gate)) {
       return NextResponse.json(
         { error: 'Pintu masuk tidak valid.' },
@@ -79,7 +103,7 @@ export async function POST(request: Request) {
 
     const { data: existingRegistration, error: existingError } =
       await supabaseAdmin
-        .from('registrations')
+        .from('registrations_vip')
         .select('id')
         .ilike('email', email)
         .maybeSingle();
@@ -99,17 +123,18 @@ export async function POST(request: Request) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('registrations')
+      .from('registrations_vip')
       .insert({
         full_name: String(body.fullName).trim(),
         phone_number: phoneNumber,
         email,
         gender: body.gender,
+        jamaah_type: body.jamaahType,
+        jamaah_name:
+          body.jamaahType === 'perorangan'
+            ? null
+            : String(body.jamaahName).trim(),
         city: String(body.city).trim(),
-        institution: body.institution
-          ? String(body.institution).trim()
-          : null,
-        // REVISI: kirim field baru ke database
         confirmation: body.confirmation,
         gate: body.gate,
       })
@@ -124,7 +149,7 @@ export async function POST(request: Request) {
       id: data.id,
     });
   } catch (err: unknown) {
-    console.error('POST /api/register error:', err);
+    console.error('POST /api/register/vip error:', err);
 
     const message =
       err instanceof Error
@@ -137,3 +162,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

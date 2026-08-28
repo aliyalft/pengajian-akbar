@@ -20,14 +20,18 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data, error } = await supabaseAdmin
-      .from('registrations')
-      .select('id, email')
-      .ilike('email', email)
-      .maybeSingle();
+    // =========================
+    // CEK TIKET UMUM
+    // =========================
+    const { data: generalTicket, error: generalError } =
+      await supabaseAdmin
+        .from('registrations')
+        .select('id, email')
+        .ilike('email', email)
+        .maybeSingle();
 
-    if (error) {
-      console.error('Find ticket error:', error);
+    if (generalError) {
+      console.error('Find general ticket error:', generalError);
 
       return NextResponse.json(
         {
@@ -39,20 +43,54 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!data) {
+    if (generalTicket) {
+      return NextResponse.json({
+        id: generalTicket.id,
+        type: 'umum',
+      });
+    }
+
+    // =========================
+    // CEK TIKET VIP
+    // =========================
+    const { data: vipTicket, error: vipError } =
+      await supabaseAdmin
+        .from('registrations_vip')
+        .select('id, email')
+        .ilike('email', email)
+        .maybeSingle();
+
+    if (vipError) {
+      console.error('Find VIP ticket error:', vipError);
+
       return NextResponse.json(
         {
-          error: 'Tidak ditemukan registrasi dengan email tersebut.',
+          error: 'Tiket tidak dapat ditemukan. Silakan coba lagi.',
         },
         {
-          status: 404,
+          status: 500,
         }
       );
     }
 
-    return NextResponse.json({
-      id: data.id,
-    });
+    if (vipTicket) {
+      return NextResponse.json({
+        id: vipTicket.id,
+        type: 'vip',
+      });
+    }
+
+    // =========================
+    // TIDAK DITEMUKAN
+    // =========================
+    return NextResponse.json(
+      {
+        error: 'Tidak ditemukan registrasi dengan email tersebut.',
+      },
+      {
+        status: 404,
+      }
+    );
   } catch (error) {
     console.error('Find ticket route error:', error);
 

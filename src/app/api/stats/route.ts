@@ -3,35 +3,94 @@ import { supabaseAdmin } from '@/lib/supabaseClient';
 
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
+    // =========================
+    // DATA TIKET UMUM
+    // =========================
+
+    const {
+      data: generalData,
+      error: generalError,
+    } = await supabaseAdmin
       .from('registrations')
       .select('checked_in');
 
-    if (error) {
+    if (generalError) {
+      console.error(
+        'Get general stats error:',
+        generalError
+      );
+
       return NextResponse.json(
-        { error: error.message },
+        {
+          error:
+            'Tidak dapat memuat statistik tiket umum.',
+        },
         { status: 500 }
       );
     }
 
-    const rows = data ?? [];
+    // =========================
+    // DATA TIKET VIP
+    // =========================
 
-    const total = rows.length;
+    const {
+      data: vipData,
+      error: vipError,
+    } = await supabaseAdmin
+      .from('registrations_vip')
+      .select('checked_in');
 
-    const checkedIn = rows.filter(
-      (row) => row.checked_in === true
-    ).length;
+    if (vipError) {
+      console.error(
+        'Get VIP stats error:',
+        vipError
+      );
+
+      return NextResponse.json(
+        {
+          error:
+            'Tidak dapat memuat statistik tiket VIP.',
+        },
+        { status: 500 }
+      );
+    }
+
+    const generalRows =
+      generalData ?? [];
+
+    const vipRows =
+      vipData ?? [];
+
+    // =========================
+    // GABUNGKAN STATISTIK
+    // =========================
+
+    const total =
+      generalRows.length +
+      vipRows.length;
+
+    const checkedIn =
+      generalRows.filter(
+        (row) => row.checked_in === true
+      ).length +
+      vipRows.filter(
+        (row) => row.checked_in === true
+      ).length;
 
     return NextResponse.json({
       checkedIn,
       total,
     });
   } catch (error) {
-    console.error('GET /api/stats error:', error);
+    console.error(
+      'GET /api/stats error:',
+      error
+    );
 
     return NextResponse.json(
       {
-        error: 'Tidak dapat memuat statistik check-in.',
+        error:
+          'Tidak dapat memuat statistik check-in.',
       },
       {
         status: 500,

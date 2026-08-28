@@ -41,7 +41,11 @@ export default function FindTicketPage() {
         );
       }
 
-      router.push(`/ticket/${data.id}`);
+      if (data.type === 'vip') {
+        router.push(`/ticket/ticket-vip/${data.id}`);
+      } else {
+        router.push(`/ticket/${data.id}`);
+      }
     } catch (err) {
       setError(
         err instanceof Error

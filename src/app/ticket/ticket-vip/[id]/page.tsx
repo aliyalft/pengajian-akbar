@@ -10,14 +10,21 @@ type TicketPageProps = {
   }>;
 };
 
-export default async function TicketPage({
+const JAMAAH_TYPE_LABEL: Record<string, string> = {
+  majelis_taklim: 'Majelis Taklim',
+  organisasi: 'Organisasi',
+  komunitas: 'Komunitas',
+  perorangan: 'Perorangan',
+};
+
+export default async function TicketVipPage({
   params,
 }: TicketPageProps) {
   const { id } = await params;
 
   const { data: registration, error } =
     await supabaseAdmin
-      .from('registrations')
+      .from('registrations_vip')
       .select(
         `
         id,
@@ -25,8 +32,9 @@ export default async function TicketPage({
         phone_number,
         email,
         gender,
+        jamaah_type,
+        jamaah_name,
         city,
-        institution,
         confirmation,
         gate,
         checked_in,
@@ -39,12 +47,12 @@ export default async function TicketPage({
 
   if (error) {
     console.error(
-      'Ticket page error:',
+      'VIP ticket page error:',
       error
     );
 
     throw new Error(
-      'Tiket tidak dapat dimuat.'
+      'Tiket VIP tidak dapat dimuat.'
     );
   }
 
@@ -55,8 +63,19 @@ export default async function TicketPage({
   const isCheckedIn =
     Boolean(registration.checked_in);
 
+  const jamaahDisplay =
+    registration.jamaah_type === 'perorangan'
+      ? 'Perorangan'
+      : `${
+          JAMAAH_TYPE_LABEL[registration.jamaah_type] ?? ''
+        }${
+          registration.jamaah_name
+            ? ` — ${registration.jamaah_name}`
+            : ''
+        }`;
+
   return (
-    <main className="ticket-page">
+    <main className="ticket-page ticket-page-vip">
       <div
         className="ticket-page-orb ticket-page-orb-left"
         aria-hidden="true"
@@ -82,11 +101,11 @@ export default async function TicketPage({
           </div>
 
           <h1 className="ticket-success-title">
-            Pendaftaran Berhasil!
+            Pendaftaran VIP Berhasil!
           </h1>
 
           <p className="ticket-success-copy">
-            Registrasi Anda untuk Pengajian Akbar
+            Registrasi VIP Anda untuk Pengajian Akbar
             MT MHABD telah terkonfirmasi.
             Silakan simpan e-ticket berikut dan
             tunjukkan QR Code kepada petugas saat
@@ -268,53 +287,43 @@ export default async function TicketPage({
                   </div>
 
 
-                  {registration.institution && (
-                    <div className="ticket-meta-item ticket-meta-wide">
+                  <div className="ticket-meta-item ticket-meta-wide">
 
-                      <span className="ticket-small-label">
-                        Instansi / Komunitas
-                      </span>
+                    <span className="ticket-small-label">
+                      Jamaah
+                    </span>
 
-                      <strong>
-                        {registration.institution}
-                      </strong>
+                    <strong>
+                      {jamaahDisplay}
+                    </strong>
 
-                    </div>
-                  )}
+                  </div>
 
 
-                  {/* ======================
-                      REVISI: Konfirmasi Kehadiran & Pintu Masuk
-                  ====================== */}
+                  <div className="ticket-meta-item">
 
-                  {registration.confirmation && (
-                    <div className="ticket-meta-item">
+                    <span className="ticket-small-label">
+                      Konfirmasi Kehadiran
+                    </span>
 
-                      <span className="ticket-small-label">
-                        Konfirmasi Kehadiran
-                      </span>
+                    <strong>
+                      {registration.confirmation}
+                    </strong>
 
-                      <strong>
-                        {registration.confirmation}
-                      </strong>
-
-                    </div>
-                  )}
+                  </div>
 
 
-                  {registration.gate && (
-                    <div className="ticket-meta-item">
+                  <div className="ticket-meta-item">
 
-                      <span className="ticket-small-label">
-                        Pintu Masuk
-                      </span>
+                    <span className="ticket-small-label">
+                      Pintu Masuk
+                    </span>
 
-                      <strong>
-                        {registration.gate}
-                      </strong>
+                    <strong>
+                      {registration.gate}
+                    </strong>
 
-                    </div>
-                  )}
+                  </div>
 
                 </div>
 
@@ -660,7 +669,7 @@ export default async function TicketPage({
           <div className="event-ticket-footer">
 
             <span>
-              Pengajian Akbar MT MHABD
+              Pengajian Akbar MT MHABD — VIP
             </span>
 
             <span>
@@ -678,7 +687,7 @@ export default async function TicketPage({
           <DownloadTicketButton />
 
           <Link
-            href="/register"
+            href="/register-vip"
             className="ticket-home-button"
           >
             <span>
@@ -695,6 +704,85 @@ export default async function TicketPage({
         </p>
 
       </div>
+
+
+      {/* ======================================================
+          LOCAL OVERRIDE — WARNA KARTU NAVY (VIP)
+
+          Semua override di bawah discope ke `.ticket-page-vip`
+          supaya TIDAK memengaruhi ticket umum (yang tetap hijau).
+          Nilai navy dipilih mengikuti pola/level warna hijau yang
+          sudah ada (gradient 3-stop, opacity dekorasi, dst) —
+          jadi hanya hue-nya yang berubah, bukan strukturnya.
+
+          Saya belum punya file CSS global asli (yang mendefinisikan
+          warna hijau untuk .event-ticket-header, .ticket-status-active,
+          dll), jadi override ini saya tulis berdasarkan warna hijau
+          yang konsisten dipakai di halaman register (misal #087455,
+          #0b7d5b, #19a576, #086b50). Kalau nanti CSS aslinya dikirim
+          dan ada bagian yang levelnya beda, tinggal saya sesuaikan lagi.
+      ====================================================== */}
+
+      <style>{`
+
+        /* HEADER — dari hijau 3-stop jadi navy 3-stop, pola sama */
+        .ticket-page-vip .event-ticket-header {
+          background: linear-gradient(
+            135deg,
+            #0b2340 0%,
+            #123a63 55%,
+            #1e5c94 100%
+          ) !important;
+        }
+
+        /* ikon & garis dekoratif header pakai currentColor,
+           jadi cukup set warna dasarnya di sini */
+        .ticket-page-vip .event-ticket-header-focus {
+          color: rgba(233, 240, 250, 0.22) !important;
+        }
+
+        .ticket-page-vip .event-ticket-eyebrow {
+          color: #cfe0f6 !important;
+        }
+
+        /* ikon tanggal/lokasi di body tiket */
+        .ticket-page-vip .ticket-event-icon {
+          color: #123a63 !important;
+          background: rgba(18, 58, 99, 0.09) !important;
+        }
+
+        /* status "Tiket Aktif" */
+        .ticket-page-vip .ticket-status-active {
+          color: #123a63 !important;
+          background: rgba(18, 58, 99, 0.08) !important;
+          border-color: rgba(18, 58, 99, 0.18) !important;
+        }
+
+        /* garis putus-putus pemisah & footer */
+        .ticket-page-vip .ticket-dashed-divider {
+          border-color: rgba(18, 58, 99, 0.25) !important;
+        }
+
+        .ticket-page-vip .event-ticket-footer {
+          border-color: rgba(18, 58, 99, 0.12) !important;
+          color: #123a63 !important;
+        }
+
+        /* frame QR & label kecil ikut aksen navy */
+        .ticket-page-vip .ticket-qr-frame {
+          border-color: rgba(18, 58, 99, 0.18) !important;
+        }
+
+        .ticket-page-vip .ticket-small-label {
+          color: #4f8dc9 !important;
+        }
+
+        .ticket-page-vip .ticket-participant h3,
+        .ticket-page-vip .ticket-meta-item strong {
+          color: #0b2340 !important;
+        }
+
+      `}</style>
 
     </main>
   );

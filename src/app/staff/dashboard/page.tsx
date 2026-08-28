@@ -15,6 +15,8 @@ type DashboardStats = {
   checkedIn: number;
 };
 
+type DashboardType = 'umum' | 'vip';
+
 type Registration = {
   id: string;
   full_name: string;
@@ -39,6 +41,19 @@ type StatusFilter =
   | 'not_checked_in';
 
 export default function StaffDashboardPage() {
+
+  /* =========================================
+     DASHBOARD TYPE
+  ========================================= */
+
+  const [dashboardType, setDashboardType] =
+    useState<DashboardType>('umum');
+
+
+  /* =========================================
+     STATS
+  ========================================= */
+
   const [stats, setStats] =
     useState<DashboardStats>({
       total: 0,
@@ -61,6 +76,11 @@ export default function StaffDashboardPage() {
     setRegistrationError,
   ] = useState<string | null>(null);
 
+
+  /* =========================================
+     FILTER
+  ========================================= */
+
   const [search, setSearch] =
     useState('');
 
@@ -69,6 +89,11 @@ export default function StaffDashboardPage() {
 
   const [statusFilter, setStatusFilter] =
     useState<StatusFilter>('all');
+
+
+  /* =========================================
+     DELETE
+  ========================================= */
 
   const [deletingId, setDeletingId] =
     useState<string | null>(null);
@@ -79,17 +104,25 @@ export default function StaffDashboardPage() {
   ========================================= */
 
   const loadStats = useCallback(async () => {
+
     try {
+
       setLoadingStats(true);
 
+      const endpoint =
+        dashboardType === 'vip'
+          ? '/api/stats-vip'
+          : '/api/stats';
+
       const response = await fetch(
-        '/api/stats',
+        endpoint,
         {
           cache: 'no-store',
         }
       );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -102,15 +135,21 @@ export default function StaffDashboardPage() {
         total: data.total,
         checkedIn: data.checkedIn,
       });
+
     } catch (error) {
+
       console.error(
         'Dashboard stats error:',
         error
       );
+
     } finally {
+
       setLoadingStats(false);
+
     }
-  }, []);
+
+  }, [dashboardType]);
 
 
   /* =========================================
@@ -119,31 +158,43 @@ export default function StaffDashboardPage() {
 
   const loadRegistrations =
     useCallback(async () => {
+
       try {
+
         setLoadingRegistrations(true);
         setRegistrationError(null);
 
-        const response = await fetch(
-          '/api/admin/registrations',
-          {
-            cache: 'no-store',
-          }
-        );
+        const endpoint =
+          dashboardType === 'vip'
+            ? '/api/admin/registrations-vip'
+            : '/api/admin/registrations';
+
+        const response =
+          await fetch(
+            endpoint,
+            {
+              cache: 'no-store',
+            }
+          );
 
         const data =
           await response.json();
 
         if (!response.ok) {
+
           throw new Error(
             data.error ||
               'Gagal memuat data jamaah.'
           );
+
         }
 
         setRegistrations(
           data.registrations ?? []
         );
+
       } catch (error) {
+
         console.error(
           'Dashboard registrations error:',
           error
@@ -154,19 +205,53 @@ export default function StaffDashboardPage() {
             ? error.message
             : 'Gagal memuat data jamaah.'
         );
-      } finally {
-        setLoadingRegistrations(false);
-      }
-    }, []);
 
+      } finally {
+
+        setLoadingRegistrations(false);
+
+      }
+
+    }, [dashboardType]);
+
+
+  /* =========================================
+     LOAD DATA
+  ========================================= */
 
   useEffect(() => {
+
     loadStats();
     loadRegistrations();
+
   }, [
     loadStats,
     loadRegistrations,
   ]);
+
+
+  /* =========================================
+     CHANGE DASHBOARD
+  ========================================= */
+
+  const handleDashboardChange = (
+    type: DashboardType
+  ) => {
+
+    if (type === dashboardType) {
+      return;
+    }
+
+    setDashboardType(type);
+
+    // Reset filter ketika pindah dashboard
+    setSearch('');
+    setGenderFilter('all');
+    setStatusFilter('all');
+
+    setRegistrations([]);
+
+  };
 
 
   /* =========================================
@@ -175,11 +260,15 @@ export default function StaffDashboardPage() {
 
   const filteredRegistrations =
     useMemo(() => {
+
       const keyword =
-        search.trim().toLowerCase();
+        search
+          .trim()
+          .toLowerCase();
 
       return registrations.filter(
         (registration) => {
+
           const matchesSearch =
             keyword.length === 0 ||
             registration.full_name
@@ -208,20 +297,26 @@ export default function StaffDashboardPage() {
 
           const matchesStatus =
             statusFilter === 'all' ||
-            (statusFilter ===
-              'checked_in' &&
-              registration.checked_in) ||
-            (statusFilter ===
-              'not_checked_in' &&
-              !registration.checked_in);
+            (
+              statusFilter ===
+                'checked_in' &&
+              registration.checked_in
+            ) ||
+            (
+              statusFilter ===
+                'not_checked_in' &&
+              !registration.checked_in
+            );
 
           return (
             matchesSearch &&
             matchesGender &&
             matchesStatus
           );
+
         }
       );
+
     }, [
       registrations,
       search,
@@ -237,6 +332,7 @@ export default function StaffDashboardPage() {
   const handleDelete = async (
     registration: Registration
   ) => {
+
     const confirmed =
       window.confirm(
         `Hapus data "${registration.full_name}"?\n\nData yang sudah dihapus tidak dapat dikembalikan.`
@@ -247,32 +343,43 @@ export default function StaffDashboardPage() {
     }
 
     try {
-      setDeletingId(registration.id);
 
-      const response = await fetch(
-        '/api/admin/registrations',
-        {
-          method: 'DELETE',
-
-          headers: {
-            'Content-Type':
-              'application/json',
-          },
-
-          body: JSON.stringify({
-            id: registration.id,
-          }),
-        }
+      setDeletingId(
+        registration.id
       );
+
+      const endpoint =
+        dashboardType === 'vip'
+          ? '/api/admin/registrations-vip'
+          : '/api/admin/registrations';
+
+      const response =
+        await fetch(
+          endpoint,
+          {
+            method: 'DELETE',
+
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
+
+            body: JSON.stringify({
+              id: registration.id,
+            }),
+          }
+        );
 
       const data =
         await response.json();
 
       if (!response.ok) {
+
         throw new Error(
           data.error ||
             'Gagal menghapus peserta.'
         );
+
       }
 
       setRegistrations(
@@ -285,7 +392,9 @@ export default function StaffDashboardPage() {
       );
 
       await loadStats();
+
     } catch (error) {
+
       console.error(
         'Delete registration error:',
         error
@@ -296,9 +405,13 @@ export default function StaffDashboardPage() {
           ? error.message
           : 'Gagal menghapus peserta.'
       );
+
     } finally {
+
       setDeletingId(null);
+
     }
+
   };
 
 
@@ -307,6 +420,7 @@ export default function StaffDashboardPage() {
   ========================================= */
 
   const handleExportExcel = () => {
+
     if (
       filteredRegistrations.length === 0
     ) {
@@ -315,8 +429,13 @@ export default function StaffDashboardPage() {
 
     const exportData =
       filteredRegistrations.map(
-        (registration, index) => ({
-          No: index + 1,
+        (
+          registration,
+          index
+        ) => ({
+
+          No:
+            index + 1,
 
           Nama:
             registration.full_name,
@@ -357,6 +476,7 @@ export default function StaffDashboardPage() {
             ).toLocaleString(
               'id-ID'
             ),
+
         })
       );
 
@@ -371,7 +491,9 @@ export default function StaffDashboardPage() {
     XLSX.utils.book_append_sheet(
       workbook,
       worksheet,
-      'Data Jamaah'
+      dashboardType === 'vip'
+        ? 'Data Jamaah VIP'
+        : 'Data Jamaah'
     );
 
     worksheet['!cols'] = [
@@ -389,8 +511,11 @@ export default function StaffDashboardPage() {
 
     XLSX.writeFile(
       workbook,
-      'data-jamaah-pengajian-akbar-mt-mhabd.xlsx'
+      dashboardType === 'vip'
+        ? 'data-jamaah-vip-pengajian-akbar-mt-mhabd.xlsx'
+        : 'data-jamaah-pengajian-akbar-mt-mhabd.xlsx'
     );
+
   };
 
 
@@ -399,41 +524,69 @@ export default function StaffDashboardPage() {
   ========================================= */
 
   const resetFilters = () => {
+
     setSearch('');
     setGenderFilter('all');
     setStatusFilter('all');
+
   };
 
 
-  const remaining = Math.max(
-    stats.total - stats.checkedIn,
-    0
-  );
+  /* =========================================
+     CALCULATIONS
+  ========================================= */
 
-  const totalIkhwan = registrations.filter(
-    (registration) => registration.gender === 'Ikhwan'
-  ).length;
+  const remaining =
+    Math.max(
+      stats.total -
+        stats.checkedIn,
+      0
+    );
 
-  const totalAkhwat = registrations.filter(
-    (registration) => registration.gender === 'Akhwat'
-  ).length;
+  const totalIkhwan =
+    registrations.filter(
+      (registration) =>
+        registration.gender ===
+        'Ikhwan'
+    ).length;
+
+  const totalAkhwat =
+    registrations.filter(
+      (registration) =>
+        registration.gender ===
+        'Akhwat'
+    ).length;
 
   const checkInRate =
     stats.total > 0
       ? Math.round(
-          (stats.checkedIn / stats.total) * 100
+          (
+            stats.checkedIn /
+            stats.total
+          ) * 100
         )
       : 0;
 
 
+  /* =========================================
+     RETURN
+  ========================================= */
+
   return (
+
     <main className="admin-dashboard-page">
+
       <div className="admin-dashboard-shell">
 
-        {/* TOP BAR */}
+
+        {/* =====================================
+            TOP BAR
+        ===================================== */}
+
         <header className="admin-dashboard-topbar">
 
           <div>
+
             <span className="admin-dashboard-kicker">
               Admin Panel
             </span>
@@ -441,6 +594,7 @@ export default function StaffDashboardPage() {
             <h1>
               Pengajian Akbar MT MHABD
             </h1>
+
           </div>
 
 
@@ -465,23 +619,91 @@ export default function StaffDashboardPage() {
         </header>
 
 
-        {/* PAGE HEADING */}
+        {/* =====================================
+            PAGE HEADING
+        ===================================== */}
+
         <section className="admin-dashboard-heading">
 
-          <h2>
-            Dashboard Kehadiran
-          </h2>
+          <div>
 
-          <p>
-            Pantau data registrasi jamaah
-            dan status check-in acara.
-          </p>
+            <h2>
+              Dashboard Kehadiran{' '}
+              {dashboardType === 'vip'
+                ? 'VIP'
+                : 'Umum'}
+            </h2>
+
+            <p>
+              Pantau data registrasi jamaah
+              dan status check-in acara.
+            </p>
+
+          </div>
+
+
+          {/* ===================================
+              UMUM / VIP SWITCH
+          =================================== */}
+
+          <div
+            className="admin-dashboard-type-switch"
+            role="tablist"
+            aria-label="Pilih jenis registrasi"
+          >
+
+            <button
+              type="button"
+              role="tab"
+              aria-selected={
+                dashboardType === 'umum'
+              }
+              className={
+                dashboardType === 'umum'
+                  ? 'admin-dashboard-type-button active'
+                  : 'admin-dashboard-type-button'
+              }
+              onClick={() =>
+                handleDashboardChange(
+                  'umum'
+                )
+              }
+            >
+              Umum
+            </button>
+
+
+            <button
+              type="button"
+              role="tab"
+              aria-selected={
+                dashboardType === 'vip'
+              }
+              className={
+                dashboardType === 'vip'
+                  ? 'admin-dashboard-type-button active'
+                  : 'admin-dashboard-type-button'
+              }
+              onClick={() =>
+                handleDashboardChange(
+                  'vip'
+                )
+              }
+            >
+              VIP
+            </button>
+
+          </div>
 
         </section>
 
 
-        {/* STATS */}
+        {/* =====================================
+            STATS
+        ===================================== */}
+
         <section className="admin-dashboard-stats">
+
 
           <div className="admin-dashboard-stat">
 
@@ -575,21 +797,31 @@ export default function StaffDashboardPage() {
         </section>
 
 
-        {/* DATA CARD */}
+        {/* =====================================
+            DATA CARD
+        ===================================== */}
+
         <section className="admin-dashboard-table-card">
 
+
           {/* TABLE HEADER */}
+
           <div className="admin-dashboard-table-head">
 
             <div>
+
               <h3>
-                Data Jamaah
+                Data Jamaah{' '}
+                {dashboardType === 'vip'
+                  ? 'VIP'
+                  : ''}
               </h3>
 
               <p>
                 Daftar peserta yang sudah
                 melakukan registrasi.
               </p>
+
             </div>
 
 
@@ -611,7 +843,10 @@ export default function StaffDashboardPage() {
           </div>
 
 
-          {/* FILTERS */}
+          {/* ===================================
+              FILTERS
+          =================================== */}
+
           <div className="admin-dashboard-filters">
 
             <div className="admin-dashboard-search">
@@ -640,6 +875,7 @@ export default function StaffDashboardPage() {
               }
               className="admin-dashboard-filter-select"
             >
+
               <option value="all">
                 Semua Gender
               </option>
@@ -651,6 +887,7 @@ export default function StaffDashboardPage() {
               <option value="Akhwat">
                 Akhwat
               </option>
+
             </select>
 
 
@@ -664,6 +901,7 @@ export default function StaffDashboardPage() {
               }
               className="admin-dashboard-filter-select"
             >
+
               <option value="all">
                 Semua Status
               </option>
@@ -675,13 +913,16 @@ export default function StaffDashboardPage() {
               <option value="not_checked_in">
                 Belum Check-in
               </option>
+
             </select>
 
 
             <button
               type="button"
               className="admin-dashboard-reset-filter"
-              onClick={resetFilters}
+              onClick={
+                resetFilters
+              }
             >
               Reset
             </button>
@@ -689,28 +930,40 @@ export default function StaffDashboardPage() {
           </div>
 
 
-          {/* RESULT INFO */}
+          {/* ===================================
+              RESULT INFO
+          =================================== */}
+
           {!loadingRegistrations &&
             !registrationError && (
+
               <div className="admin-dashboard-result-info">
 
                 Menampilkan{' '}
+
                 <strong>
                   {
                     filteredRegistrations.length
                   }
                 </strong>{' '}
+
                 dari{' '}
+
                 <strong>
                   {registrations.length}
                 </strong>{' '}
+
                 peserta
 
               </div>
+
             )}
 
 
-          {/* TABLE */}
+          {/* ===================================
+              TABLE
+          =================================== */}
+
           {loadingRegistrations ? (
 
             <div className="admin-dashboard-empty">
@@ -745,8 +998,12 @@ export default function StaffDashboardPage() {
               <table className="admin-dashboard-table">
 
                 <thead>
+
                   <tr>
-                    <th>No.</th>
+
+                    <th>
+                      No.
+                    </th>
 
                     <th>
                       Nama Jamaah
@@ -783,7 +1040,9 @@ export default function StaffDashboardPage() {
                     <th>
                       Aksi
                     </th>
+
                   </tr>
+
                 </thead>
 
 
@@ -807,11 +1066,15 @@ export default function StaffDashboardPage() {
 
 
                         <td>
+
                           <strong className="admin-dashboard-name">
+
                             {
                               registration.full_name
                             }
+
                           </strong>
+
                         </td>
 
 
@@ -852,6 +1115,7 @@ export default function StaffDashboardPage() {
 
 
                         <td>
+
                           <span
                             className={
                               registration.checked_in
@@ -859,16 +1123,20 @@ export default function StaffDashboardPage() {
                                 : 'admin-dashboard-status admin-dashboard-status-pending'
                             }
                           >
+
                             {
                               registration.checked_in
                                 ? 'Sudah Check-in'
                                 : 'Belum Check-in'
                             }
+
                           </span>
+
                         </td>
 
 
                         <td>
+
                           {registration.checked_in_at
                             ? new Date(
                                 registration.checked_in_at
@@ -882,10 +1150,12 @@ export default function StaffDashboardPage() {
                                 }
                               )
                             : '—'}
+
                         </td>
 
 
                         <td>
+
                           <button
                             type="button"
                             className="admin-dashboard-delete"
@@ -899,11 +1169,14 @@ export default function StaffDashboardPage() {
                               )
                             }
                           >
+
                             {deletingId ===
                             registration.id
                               ? 'Menghapus...'
                               : 'Hapus'}
+
                           </button>
+
                         </td>
 
                       </tr>
@@ -916,11 +1189,14 @@ export default function StaffDashboardPage() {
               </table>
 
             </div>
+
           )}
 
         </section>
 
       </div>
+
     </main>
+
   );
 }

@@ -14,6 +14,13 @@ type Gender =
   | 'Akhwat'
   | '';
 
+type JamaahType =
+  | 'majelis_taklim'
+  | 'organisasi'
+  | 'komunitas'
+  | 'perorangan'
+  | '';
+
 type Confirmation =
   | 'YA'
   | 'TIDAK'
@@ -36,46 +43,41 @@ type CityOption = {
   name: string;
 };
 
-// SESUAIKAN dengan tanggal acara kamu
 const EVENT_DATE = new Date(
-  '2026-09-23T08:00:00+07:00'
+  '2026-09-23T13:00:00+07:00'
 );
 
-export default function RegisterPage() {
+const JAMAAH_TYPE_LABEL: Record<
+  Exclude<JamaahType, ''>,
+  string
+> = {
+  majelis_taklim: 'Nama Majelis Taklim',
+  organisasi: 'Nama Organisasi',
+  komunitas: 'Nama Komunitas',
+  perorangan: '',
+};
+
+const JAMAAH_TYPE_PLACEHOLDER: Record<
+  Exclude<JamaahType, ''>,
+  string
+> = {
+  majelis_taklim:
+    'Contoh: Majelis Taklim Al-Ikhlas',
+
+  organisasi:
+    'Contoh: Nama organisasi Anda',
+
+  komunitas:
+    'Contoh: Nama komunitas Anda',
+
+  perorangan: '',
+};
+
+export default function RegisterVipPage() {
   const router = useRouter();
 
   // =========================
-  // CITY
-  // =========================
-
-  const [cities, setCities] =
-    useState<CityOption[]>([]);
-
-  useEffect(() => {
-    const loadCities = async () => {
-      try {
-        const response = await fetch(
-          '/api/regions/cities'
-        );
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setCities(data.cities ?? []);
-        }
-      } catch (error) {
-        console.error(
-          'Failed to load cities:',
-          error
-        );
-      }
-    };
-
-    loadCities();
-  }, []);
-
-  // =========================
-  // FORM
+  // FORM STATE
   // =========================
 
   const [fullName, setFullName] =
@@ -93,10 +95,52 @@ export default function RegisterPage() {
   const [city, setCity] =
     useState('');
 
-    const [showCitySuggestions, setShowCitySuggestions] =
-  useState(false);
+  // =========================
+  // CITY DATA
+  // =========================
 
-  const [institution, setInstitution] =
+  const [cities, setCities] =
+    useState<CityOption[]>([]);
+
+  const [
+    showCitySuggestions,
+    setShowCitySuggestions,
+  ] = useState(false);
+
+  useEffect(() => {
+    const loadCities = async () => {
+      try {
+        const response = await fetch(
+          '/api/regions/cities'
+        );
+
+        const data =
+          await response.json();
+
+        if (response.ok) {
+          setCities(
+            data.cities ?? []
+          );
+        }
+      } catch (error) {
+        console.error(
+          'Failed to load cities:',
+          error
+        );
+      }
+    };
+
+    loadCities();
+  }, []);
+
+  /* ======================
+      VIP: Jamaah
+  ====================== */
+
+  const [jamaahType, setJamaahType] =
+    useState<JamaahType>('');
+
+  const [jamaahName, setJamaahName] =
     useState('');
 
   const [confirmation, setConfirmation] =
@@ -119,9 +163,9 @@ export default function RegisterPage() {
       seconds: 0,
     });
 
-  // =========================
-  // COUNTDOWN
-  // =========================
+  /* ======================
+      COUNTDOWN
+  ====================== */
 
   useEffect(() => {
     const calculateCountdown = () => {
@@ -138,45 +182,70 @@ export default function RegisterPage() {
         );
 
       setCountdown({
-        days: Math.floor(
-          distance /
-            (1000 * 60 * 60 * 24)
-        ),
+        days:
+          Math.floor(
+            distance /
+              (
+                1000 *
+                60 *
+                60 *
+                24
+              )
+          ),
 
-        hours: Math.floor(
-          (distance /
-            (1000 * 60 * 60)) %
-            24
-        ),
+        hours:
+          Math.floor(
+            (
+              distance /
+              (
+                1000 *
+                60 *
+                60
+              )
+            ) % 24
+          ),
 
-        minutes: Math.floor(
-          (distance /
-            (1000 * 60)) %
-            60
-        ),
+        minutes:
+          Math.floor(
+            (
+              distance /
+              (
+                1000 *
+                60
+              )
+            ) % 60
+          ),
 
-        seconds: Math.floor(
-          (distance / 1000) % 60
-        ),
+        seconds:
+          Math.floor(
+            (
+              distance /
+              1000
+            ) % 60
+          ),
       });
     };
 
     calculateCountdown();
 
-    const interval = setInterval(
-      calculateCountdown,
-      1000
-    );
+    const interval =
+      setInterval(
+        calculateCountdown,
+        1000
+      );
 
     return () =>
       clearInterval(interval);
   }, []);
 
-  // ⬇️ MULAIKAN KODE LAMA KAMU DI SINI
 
   /* ======================
       SUBMIT
   ====================== */
+
+  const needsJamaahName =
+    jamaahType !== '' &&
+    jamaahType !== 'perorangan';
 
   const handleSubmit = async (
     event:
@@ -186,13 +255,73 @@ export default function RegisterPage() {
 
     if (submitting) return;
 
+    /* ======================
+        Validasi manual untuk SEMUA field —
+        menggantikan atribut `required` bawaan browser
+        sepenuhnya, dan `type="email"` / `type="tel"`
+        diganti jadi `type="text"` + `inputMode`. Safari
+        di Mac ternyata masih memicu popup validasi
+        bawaan meski `noValidate` sudah dipasang, jadi
+        cara paling aman adalah tidak mengandalkan
+        validasi native sama sekali di form ini —
+        validasi penuh dilakukan di sini + di server
+        (/api/register/vip) seperti sebelumnya.
+    ====================== */
+
+    if (!fullName.trim()) {
+      setError('Nama Lengkap wajib diisi.');
+      return;
+    }
+
+    if (!phoneNumber.trim()) {
+      setError('No. WhatsApp wajib diisi.');
+      return;
+    }
+
+    if (!email.trim()) {
+      setError('Email wajib diisi.');
+      return;
+    }
+
+    if (!gender) {
+      setError('Silakan pilih Kategori Jamaah.');
+      return;
+    }
+
+    if (!city.trim()) {
+      setError('Kota / Domisili wajib diisi.');
+      return;
+    }
+
+    if (!jamaahType) {
+      setError('Silakan pilih Jamaah.');
+      return;
+    }
+
+    if (needsJamaahName && !jamaahName.trim()) {
+      setError(
+        'Nama Majelis Taklim/Organisasi/Komunitas wajib diisi.'
+      );
+      return;
+    }
+
+    if (!confirmation) {
+      setError('Silakan pilih Konfirmasi Kehadiran.');
+      return;
+    }
+
+    if (!gate) {
+      setError('Silakan pilih Pintu Masuk dari arah.');
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
     try {
       const response =
         await fetch(
-          '/api/register',
+          '/api/register-vip',
           {
             method: 'POST',
 
@@ -207,9 +336,13 @@ export default function RegisterPage() {
                 phoneNumber,
                 email,
                 gender,
+                jamaahType,
+                // "Perorangan" tidak butuh nama tambahan
+                jamaahName:
+                  jamaahType === 'perorangan'
+                    ? ''
+                    : jamaahName,
                 city,
-                institution,
-                // REVISI: field baru dikirim ke API
                 confirmation,
                 gate,
               }),
@@ -225,7 +358,7 @@ export default function RegisterPage() {
           data.id
         ) {
           router.push(
-            `/ticket/${data.id}`
+            `/ticket/ticket-vip/${data.id}`
           );
 
           return;
@@ -238,7 +371,7 @@ export default function RegisterPage() {
       }
 
       router.push(
-        `/ticket/${data.id}`
+        `/ticket/ticket-vip/${data.id}`
       );
     } catch (err) {
       setError(
@@ -888,6 +1021,7 @@ export default function RegisterPage() {
                 onSubmit={
                   handleSubmit
                 }
+                noValidate
               >
 
                 <div className="form-grid">
@@ -913,7 +1047,6 @@ export default function RegisterPage() {
                           event.target.value
                         )
                       }
-                      required
                     />
 
                   </div>
@@ -925,12 +1058,14 @@ export default function RegisterPage() {
                       className="form-label"
                       htmlFor="phoneNumber"
                     >
-                      No. Telepon *
+                      No. WhatsApp *
                     </label>
 
                     <input
                       id="phoneNumber"
-                      type="tel"
+                      type="text"
+                      inputMode="tel"
+                      autoComplete="tel"
                       className="form-input"
                       placeholder="08xxxxxxxxxx"
                       value={phoneNumber}
@@ -939,7 +1074,6 @@ export default function RegisterPage() {
                           event.target.value
                         )
                       }
-                      required
                     />
 
                   </div>
@@ -956,7 +1090,9 @@ export default function RegisterPage() {
 
                     <input
                       id="email"
-                      type="email"
+                      type="text"
+                      inputMode="email"
+                      autoComplete="email"
                       className="form-input"
                       placeholder="nama@email.com"
                       value={email}
@@ -965,7 +1101,6 @@ export default function RegisterPage() {
                           event.target.value
                         )
                       }
-                      required
                     />
 
                   </div>
@@ -990,7 +1125,6 @@ export default function RegisterPage() {
                             .value as Gender
                         )
                       }
-                      required
                     >
 
                       <option value="">
@@ -1010,7 +1144,7 @@ export default function RegisterPage() {
                   </div>
 
 
-                  <div className="form-group city-field">
+<div className="form-group city-field">
 
   <label
     className="form-label"
@@ -1073,9 +1207,7 @@ export default function RegisterPage() {
                 className="city-suggestion-item"
                 onClick={() => {
                   setCity(item.name);
-                  setShowCitySuggestions(
-                    false
-                  );
+                  setShowCitySuggestions(false);
                 }}
               >
                 {item.name}
@@ -1090,34 +1222,104 @@ export default function RegisterPage() {
 </div>
 
 
-                  <div className="form-group">
+                  {/* ======================
+                      VIP: Jamaah — 4 kategori,
+                      menentukan posisi duduk VIP
+                  ====================== */}
 
-                    <label
-                      className="form-label"
-                      htmlFor="institution"
-                    >
-                      Jamaah
+                  <div className="form-group form-group-full">
+
+                    <label className="form-label">
+                      Jamaah *
                     </label>
 
-                    <input
-                      id="institution"
-                      type="text"
-                      className="form-input"
-                      placeholder="Majelis/Pesantren/Komunitas"
-                      value={institution}
-                      onChange={(event) =>
-                        setInstitution(
-                          event.target.value
-                        )
-                      }
-                    />
+                    <div className="radio-pill-group">
+
+                      <label className="radio-pill">
+                        <input
+                          type="radio"
+                          name="jamaahType"
+                          value="majelis_taklim"
+                          checked={jamaahType === 'majelis_taklim'}
+                          onChange={() =>
+                            setJamaahType('majelis_taklim')
+                          }
+                        />
+                        <span>Majelis Taklim</span>
+                      </label>
+
+                      <label className="radio-pill">
+                        <input
+                          type="radio"
+                          name="jamaahType"
+                          value="organisasi"
+                          checked={jamaahType === 'organisasi'}
+                          onChange={() =>
+                            setJamaahType('organisasi')
+                          }
+                        />
+                        <span>Organisasi</span>
+                      </label>
+
+                      <label className="radio-pill">
+                        <input
+                          type="radio"
+                          name="jamaahType"
+                          value="komunitas"
+                          checked={jamaahType === 'komunitas'}
+                          onChange={() =>
+                            setJamaahType('komunitas')
+                          }
+                        />
+                        <span>Komunitas</span>
+                      </label>
+
+                      <label className="radio-pill">
+                        <input
+                          type="radio"
+                          name="jamaahType"
+                          value="perorangan"
+                          checked={jamaahType === 'perorangan'}
+                          onChange={() =>
+                            setJamaahType('perorangan')
+                          }
+                        />
+                        <span>Perorangan</span>
+                      </label>
+
+                    </div>
+
+                    {needsJamaahName && (
+                      <input
+                        type="text"
+                        className="form-input mt-12"
+                        placeholder={
+                          JAMAAH_TYPE_PLACEHOLDER[
+                            jamaahType as Exclude<
+                              JamaahType,
+                              ''
+                            >
+                          ]
+                        }
+                        value={jamaahName}
+                        onChange={(event) =>
+                          setJamaahName(
+                            event.target.value
+                          )
+                        }
+                        aria-label={
+                          JAMAAH_TYPE_LABEL[
+                            jamaahType as Exclude<
+                              JamaahType,
+                              ''
+                            >
+                          ]
+                        }
+                      />
+                    )}
 
                   </div>
 
-
-                  {/* ======================
-                      REVISI: Konfirmasi Kehadiran
-                  ====================== */}
 
                   <div className="form-group">
 
@@ -1138,7 +1340,6 @@ export default function RegisterPage() {
                             .value as Confirmation
                         )
                       }
-                      required
                     >
 
                       <option value="">
@@ -1158,10 +1359,6 @@ export default function RegisterPage() {
                   </div>
 
 
-                  {/* ======================
-                      REVISI: Pintu Masuk dari Arah
-                  ====================== */}
-
                   <div className="form-group form-group-full">
 
                     <label className="form-label">
@@ -1179,7 +1376,6 @@ export default function RegisterPage() {
                           onChange={() =>
                             setGate('Surapati')
                           }
-                          required
                         />
                         <span>Surapati</span>
                       </label>
@@ -1557,6 +1753,9 @@ export default function RegisterPage() {
       {/* ==================================================
           LOCAL OVERRIDES
           HANYA UNTUK RIGHT COLUMN + TACTLINK + MOBILE ORDER
+          (Sama persis dengan register umum — tidak ada
+          override warna VIP di halaman ini. Beda warna
+          hanya di halaman ticket VIP.)
       ================================================== */}
 
       <style jsx global>{`
@@ -3011,10 +3210,10 @@ export default function RegisterPage() {
 
 
         /* =============================================
-           REVISI: Konfirmasi Kehadiran & Pintu Masuk
-           Class baru: .form-group-full, .radio-pill-group,
-           .radio-pill — tema hijau/emas mengikuti tema umum.
-           Silakan sesuaikan lagi saat CSS final dikirim.
+           Konfirmasi Kehadiran & Pintu Masuk / Jamaah
+           Class: .form-group-full, .radio-pill-group,
+           .radio-pill — tema hijau/emas mengikuti tema
+           umum (sama seperti di form umum).
         ============================================= */
 
         .form-group-full {
@@ -3051,6 +3250,10 @@ export default function RegisterPage() {
 
         .radio-pill input {
           accent-color: #0b7d5b;
+        }
+
+        .mt-12 {
+          margin-top: 12px;
         }
 
 
