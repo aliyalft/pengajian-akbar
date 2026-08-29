@@ -1,86 +1,109 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseClient';
 
-export async function GET() {
+export async function GET(
+  request: NextRequest
+) {
   try {
-    // =========================
-    // DATA TIKET UMUM
-    // =========================
+    const { searchParams } =
+      new URL(request.url);
+
+    /*
+     * Default:
+     * UMUM
+     *
+     * /api/stats
+     * /api/stats?type=umum
+     *
+     * Keduanya membaca registrations saja.
+     */
+
+    const type =
+      searchParams.get('type') || 'umum';
+
+    // =====================================================
+    // VALIDASI TYPE
+    // =====================================================
+
+    if (
+      type !== 'umum' &&
+      type !== 'vip'
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Tipe statistik tidak valid.',
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    // =====================================================
+    // TENTUKAN TABLE
+    // =====================================================
+
+    const tableName =
+      type === 'vip'
+        ? 'registrations_vip'
+        : 'registrations';
+
+    // =====================================================
+    // AMBIL DATA SESUAI TYPE
+    // =====================================================
 
     const {
-      data: generalData,
-      error: generalError,
+      data,
+      error,
     } = await supabaseAdmin
-      .from('registrations')
+      .from(tableName)
       .select('checked_in');
 
-    if (generalError) {
+    if (error) {
       console.error(
-        'Get general stats error:',
-        generalError
+        `Get ${type} stats error:`,
+        error
       );
 
       return NextResponse.json(
         {
           error:
-            'Tidak dapat memuat statistik tiket umum.',
+            type === 'vip'
+              ? 'Tidak dapat memuat statistik tiket VIP.'
+              : 'Tidak dapat memuat statistik tiket umum.',
         },
-        { status: 500 }
-      );
-    }
-
-    // =========================
-    // DATA TIKET VIP
-    // =========================
-
-    const {
-      data: vipData,
-      error: vipError,
-    } = await supabaseAdmin
-      .from('registrations_vip')
-      .select('checked_in');
-
-    if (vipError) {
-      console.error(
-        'Get VIP stats error:',
-        vipError
-      );
-
-      return NextResponse.json(
         {
-          error:
-            'Tidak dapat memuat statistik tiket VIP.',
-        },
-        { status: 500 }
+          status: 500,
+        }
       );
     }
 
-    const generalRows =
-      generalData ?? [];
+    // =====================================================
+    // HITUNG STATISTIK
+    // =====================================================
 
-    const vipRows =
-      vipData ?? [];
-
-    // =========================
-    // GABUNGKAN STATISTIK
-    // =========================
+    const rows = data ?? [];
 
     const total =
-      generalRows.length +
-      vipRows.length;
+      rows.length;
 
     const checkedIn =
-      generalRows.filter(
-        (row) => row.checked_in === true
-      ).length +
-      vipRows.filter(
-        (row) => row.checked_in === true
+      rows.filter(
+        (row) =>
+          row.checked_in === true
       ).length;
 
+    // =====================================================
+    // RESPONSE
+    // =====================================================
+
     return NextResponse.json({
+      type,
       checkedIn,
       total,
     });
+
   } catch (error) {
     console.error(
       'GET /api/stats error:',

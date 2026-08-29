@@ -9,6 +9,10 @@ import {
 import Html5QrScanner from '@/components/Html5QrScanner';
 import StaffLogoutButton from '@/components/StaffLogoutButton';
 
+type CheckinStatus =
+  | 'success'
+  | 'already_checked_in';
+
 type Registration = {
   id: string;
   full_name: string;
@@ -19,7 +23,19 @@ type Registration = {
   institution: string | null;
   checked_in: boolean;
   checked_in_at: string | null;
+
   ticket_type?: 'UMUM' | 'VIP';
+
+  /*
+   * Status check-in terakhir.
+   *
+   * Field ini akan digunakan setelah API/database
+   * menyimpan status terakhir:
+   *
+   * success
+   * already_checked_in
+   */
+  last_checkin_status?: CheckinStatus;
 };
 
 type ScanResult =
@@ -36,16 +52,22 @@ type ScanHistoryItem = {
   id: string;
   registrationId?: string;
   name: string;
+
   status:
     | 'success'
     | 'already_checked_in'
     | 'error';
+
   time: string;
   message?: string;
   ticketType?: 'UMUM' | 'VIP';
 };
 
 export default function ScannerPage() {
+  // =========================================================
+  // STATE
+  // =========================================================
+
   const [result, setResult] =
     useState<ScanResult | null>(null);
 
@@ -53,6 +75,13 @@ export default function ScannerPage() {
     useState<string | null>(null);
 
   const [checkingIn, setCheckingIn] =
+    useState(false);
+
+  /*
+   * Mencegah kamera membaca QR yang sama
+   * berkali-kali dalam waktu sangat singkat.
+   */
+  const [scanLocked, setScanLocked] =
     useState(false);
 
   const [showHelp, setShowHelp] =
@@ -69,6 +98,10 @@ export default function ScannerPage() {
     total: 0,
   });
 
+  // =========================================================
+  // LOAD STATS
+  // =========================================================
+
   const loadStats = useCallback(async () => {
     try {
       const response = await fetch(
@@ -78,7 +111,8 @@ export default function ScannerPage() {
         }
       );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -88,8 +122,10 @@ export default function ScannerPage() {
       }
 
       setStats({
-        checkedIn: data.checkedIn,
-        total: data.total,
+        checkedIn:
+          data.checkedIn,
+        total:
+          data.total,
       });
     } catch (err) {
       console.error(
@@ -99,57 +135,120 @@ export default function ScannerPage() {
     }
   }, []);
 
+  // =========================================================
+  // LOAD HISTORY
+  // =========================================================
+
   const loadHistory = useCallback(async () => {
-    try {
-      const response = await fetch(
-        '/api/admin/registrations',
-        {
-          cache: 'no-store',
-        }
+  try {
+    // =====================================================
+    // LOAD DATA UMUM + VIP BERSAMAAN
+    // =====================================================
+
+    const [umumResponse, vipResponse] =
+      await Promise.all([
+        fetch(
+          '/api/admin/registrations?type=umum',
+          {
+            cache: 'no-store',
+          }
+        ),
+
+        fetch(
+          '/api/admin/registrations?type=vip',
+          {
+            cache: 'no-store',
+          }
+        ),
+      ]);
+
+    const umumData =
+      await umumResponse.json();
+
+    const vipData =
+      await vipResponse.json();
+
+    if (!umumResponse.ok) {
+      throw new Error(
+        umumData.error ||
+          'Gagal memuat data jamaah umum.'
       );
+    }
 
-      const data = await response.json();
+    if (!vipResponse.ok) {
+      throw new Error(
+        vipData.error ||
+          'Gagal memuat data jamaah VIP.'
+      );
+    }
 
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            'Gagal memuat riwayat scan.'
-        );
-      }
+    // =====================================================
+    // DATA UMUM
+    // =====================================================
 
-      const registrations =
-        (data.registrations ??
-          []) as Registration[];
+    const umumRegistrations =
+      (umumData.registrations ??
+        []) as Registration[];
 
-      const checkedInHistory: ScanHistoryItem[] =
-        registrations
-          .filter(
-            (registration) =>
-              registration.checked_in &&
-              registration.checked_in_at
-          )
-          .sort(
-            (a, b) =>
-              new Date(
-                b.checked_in_at as string
-              ).getTime() -
-              new Date(
-                a.checked_in_at as string
-              ).getTime()
-          )
-          .slice(0, 8)
-          .map((registration) => ({
-            id: `db-${registration.id}`,
+    // =====================================================
+    // DATA VIP
+    // =====================================================
 
-            registrationId:
-              registration.id,
+    const vipRegistrations =
+      (vipData.registrations ??
+        []) as Registration[];
 
-            name:
-              registration.full_name,
+    // =====================================================
+    // GABUNGKAN UMUM + VIP
+    // =====================================================
 
-            status: 'success',
+    const allRegistrations: Registration[] =
+      [
+        ...umumRegistrations,
+        ...vipRegistrations,
+      ];
 
-            time: new Date(
+    // =====================================================
+    // AMBIL YANG SUDAH CHECK-IN
+    // =====================================================
+
+    const checkedInHistory: ScanHistoryItem[] =
+      allRegistrations
+        .filter(
+          (registration) =>
+            registration.checked_in &&
+            registration.checked_in_at
+        )
+        .sort(
+          (a, b) =>
+            new Date(
+              b.checked_in_at as string
+            ).getTime() -
+            new Date(
+              a.checked_in_at as string
+            ).getTime()
+        )
+        .slice(0, 8)
+        .map((registration) => ({
+          id: `db-${registration.id}`,
+
+          registrationId:
+            registration.id,
+
+          name:
+            registration.full_name,
+
+          /*
+           * Setelah refresh, data dari database
+           * dianggap sebagai aktivitas check-in berhasil.
+           *
+           * "already_checked_in" hanya muncul ketika
+           * QR benar-benar discan ulang.
+           */
+          status: 'success',
+
+          time:
+            new Date(
               registration.checked_in_at as string
             ).toLocaleTimeString(
               'id-ID',
@@ -159,51 +258,99 @@ export default function ScannerPage() {
               }
             ),
 
-            ticketType:
-              registration.ticket_type,
-          }));
+          ticketType:
+            registration.ticket_type ??
+            (
+              registration.id.startsWith(
+                'VIP-'
+              )
+                ? 'VIP'
+                : 'UMUM'
+            ),
+        }));
 
-      setHistory(checkedInHistory);
-    } catch (err) {
-      console.error(
-        'Load scan history error:',
-        err
-      );
-    }
-  }, []);
+    setHistory(
+      checkedInHistory
+    );
+  } catch (err) {
+    console.error(
+      'Load scan history error:',
+      err
+    );
+  }
+}, []);
+
+  // =========================================================
+  // INITIAL LOAD
+  // =========================================================
 
   useEffect(() => {
     loadStats();
     loadHistory();
-  }, [loadStats, loadHistory]);
+  }, [
+    loadStats,
+    loadHistory,
+  ]);
+
+  // =========================================================
+  // SCAN SUCCESS
+  // =========================================================
 
   const handleScanSuccess = async (
     decodedText: string
   ) => {
-    if (checkingIn) return;
+    /*
+     * Kamera bisa membaca QR yang sama
+     * beberapa kali.
+     *
+     * checkingIn:
+     * mencegah request berjalan bersamaan.
+     *
+     * scanLocked:
+     * memberi jeda setelah scan selesai
+     * supaya hasil tidak langsung tertimpa.
+     */
+    if (
+      checkingIn ||
+      scanLocked
+    ) {
+      return;
+    }
 
+    setScanLocked(true);
     setCheckingIn(true);
+
+    /*
+     * Bersihkan hasil/error sebelumnya
+     * sebelum memproses QR baru.
+     */
     setError(null);
     setResult(null);
 
     try {
-      const response = await fetch(
-        '/api/checkin',
-        {
-          method: 'POST',
+      // =====================================================
+      // CHECK-IN REQUEST
+      // =====================================================
 
-          headers: {
-            'Content-Type':
-              'application/json',
-          },
+      const response =
+        await fetch(
+          '/api/checkin',
+          {
+            method: 'POST',
 
-          body: JSON.stringify({
-            id: decodedText,
-          }),
-        }
-      );
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
 
-      const data = await response.json();
+            body: JSON.stringify({
+              id: decodedText,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -215,50 +362,105 @@ export default function ScannerPage() {
       const scanResult =
         data as ScanResult;
 
-      setResult(scanResult);
+      // =====================================================
+      // TAMPILKAN HASIL SCAN
+      // =====================================================
 
-      const successHistoryItem: ScanHistoryItem =
+      setResult(
+        scanResult
+      );
+
+      // =====================================================
+      // TAMBAHKAN HASIL KE HISTORY
+      // =====================================================
+
+      const historyItem: ScanHistoryItem =
         {
-          id: crypto.randomUUID(),
+          id:
+            crypto.randomUUID(),
 
           registrationId:
-            scanResult.registration.id,
+            scanResult
+              .registration.id,
 
           name:
-            scanResult.registration
+            scanResult
+              .registration
               .full_name,
 
+          /*
+           * PENTING:
+           *
+           * Ambil status langsung dari response API.
+           *
+           * Jadi:
+           *
+           * success
+           * →
+           * Check-in berhasil
+           *
+           * already_checked_in
+           * →
+           * Sudah pernah check-in
+           */
           status:
             scanResult.status,
 
           time:
-            new Date().toLocaleTimeString(
-              'id-ID',
-              {
-                hour: '2-digit',
-                minute: '2-digit',
-              }
-            ),
+            new Date()
+              .toLocaleTimeString(
+                'id-ID',
+                {
+                  hour:
+                    '2-digit',
+
+                  minute:
+                    '2-digit',
+                }
+              ),
 
           ticketType:
-            scanResult.registration
+            scanResult
+              .registration
               .ticket_type,
         };
 
-      setHistory((current) => {
-        const withoutSameRegistration =
-          current.filter(
-            (item) =>
-              item.registrationId !==
-              scanResult.registration.id
-          );
+      setHistory(
+        (current) => {
+          /*
+           * Hapus history lama untuk
+           * registration yang sama.
+           *
+           * Dengan begitu orang yang sama
+           * hanya punya satu entry terbaru.
+           */
+          const withoutSameRegistration =
+            current.filter(
+              (item) =>
+                item.registrationId !==
+                scanResult
+                  .registration.id
+            );
 
-        return [
-          successHistoryItem,
-          ...withoutSameRegistration,
-        ].slice(0, 8);
-      });
+          return [
+            historyItem,
+            ...withoutSameRegistration,
+          ].slice(0, 8);
+        }
+      );
 
+      // =====================================================
+      // UPDATE STATS
+      // =====================================================
+
+      /*
+       * Stats hanya berubah ketika
+       * benar-benar berhasil check-in
+       * pertama kali.
+       *
+       * Kalau already_checked_in,
+       * jumlah kehadiran tidak berubah.
+       */
       if (
         scanResult.status ===
         'success'
@@ -266,49 +468,76 @@ export default function ScannerPage() {
         await loadStats();
       }
     } catch (err) {
+      // =====================================================
+      // ERROR
+      // =====================================================
+
       const message =
         err instanceof Error
           ? err.message
           : 'Terjadi kesalahan saat check-in.';
 
-      setError(message);
+      setError(
+        message
+      );
 
       const errorHistoryItem: ScanHistoryItem =
         {
-          id: crypto.randomUUID(),
+          id:
+            crypto.randomUUID(),
 
-          name: 'QR tidak valid',
+          name:
+            'QR tidak valid',
 
-          status: 'error',
+          status:
+            'error',
 
-          message,
+          message:
+            message,
 
           time:
-            new Date().toLocaleTimeString(
-              'id-ID',
-              {
-                hour: '2-digit',
-                minute: '2-digit',
-              }
-            ),
+            new Date()
+              .toLocaleTimeString(
+                'id-ID',
+                {
+                  hour:
+                    '2-digit',
+
+                  minute:
+                    '2-digit',
+                }
+              ),
         };
 
-      setHistory((current) => {
-        const updatedHistory: ScanHistoryItem[] =
-          [
+      setHistory(
+        (current) => {
+          return [
             errorHistoryItem,
             ...current,
-          ];
-
-        return updatedHistory.slice(
-          0,
-          8
-        );
-      });
+          ].slice(0, 8);
+        }
+      );
     } finally {
       setCheckingIn(false);
+
+      /*
+       * Beri jeda 2,5 detik.
+       *
+       * Ini mencegah kamera langsung
+       * memproses QR yang sama berulang kali.
+       */
+      window.setTimeout(
+        () => {
+          setScanLocked(false);
+        },
+        2500
+      );
     }
   };
+
+  // =========================================================
+  // PROGRESS
+  // =========================================================
 
   const progress =
     stats.total > 0
@@ -322,26 +551,66 @@ export default function ScannerPage() {
   const currentHistory =
     history;
 
+  // =========================================================
+  // PAGE
+  // =========================================================
+
   return (
     <main className="scanner-page-v3">
+
+      {/* ===================================================
+          BACKGROUND PATTERN
+      =================================================== */}
+
       <div
         className="scanner-page-v3-pattern"
         aria-hidden="true"
       />
 
+      {/* ===================================================
+          BACKGROUND DECORATION
+      =================================================== */}
+
       <div
         className="scanner-page-decoration"
         aria-hidden="true"
       >
-        <div className="scanner-page-orbit scanner-page-orbit-left" />
-        <div className="scanner-page-orbit scanner-page-orbit-right" />
 
+        {/* LEFT ORBIT */}
+        <div
+          className="
+            scanner-page-orbit
+            scanner-page-orbit-left
+          "
+        />
+
+        {/* RIGHT ORBIT */}
+        <div
+          className="
+            scanner-page-orbit
+            scanner-page-orbit-right
+          "
+        />
+
+        {/* LANTERN */}
         <svg
           className="scanner-page-lantern"
           viewBox="0 0 64 112"
         >
           <path
-            d="M32 0v12M23 12h18M20 18h24M24 18l-8 16v42l16 21 16-21V34l-8-16M16 39h32M16 72h32M24 39v33M40 39v33M23 82h18M28 97v10h8V97"
+            d="
+              M32 0v12
+              M23 12h18
+              M20 18h24
+              M24 18l-8 16v42
+              l16 21 16-21V34l-8-16
+              M16 39h32
+              M16 72h32
+              M24 39v33
+              M40 39v33
+              M23 82h18
+              M28 97v10h8V97
+            "
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -350,29 +619,65 @@ export default function ScannerPage() {
           />
         </svg>
 
+        {/* CRESCENT */}
         <svg
           className="scanner-page-crescent"
           viewBox="0 0 100 100"
         >
           <path
-            d="M65 15c-23 5-39 26-35 49 4 24 27 40 51 34-18-5-31-22-31-42 0-17 8-32 22-41-2 0-5 0-7 0Z"
+            d="
+              M65 15
+              c-23 5-39 26-35 49
+              4 24 27 40 51 34
+              -18-5-31-22-31-42
+              0-17 8-32 22-41
+              -2 0-5 0-7 0Z
+            "
             fill="currentColor"
           />
         </svg>
 
+        {/* MOSQUE */}
         <div className="scanner-page-mosque">
-          <span className="scanner-page-mosque-dome" />
-          <span className="scanner-page-mosque-body" />
-          <span className="scanner-page-mosque-minaret" />
+
+          <span
+            className="
+              scanner-page-mosque-dome
+            "
+          />
+
+          <span
+            className="
+              scanner-page-mosque-body
+            "
+          />
+
+          <span
+            className="
+              scanner-page-mosque-minaret
+            "
+          />
+
         </div>
+
       </div>
+
+      {/* ===================================================
+          MAIN SHELL
+      =================================================== */}
 
       <div className="scanner-v3-shell">
 
-        {/* HELP BUTTON */}
+        {/* =================================================
+            HELP BUTTON
+        ================================================= */}
+
         <button
           type="button"
-          className="scanner-help-button scanner-help-button-top"
+          className="
+            scanner-help-button
+            scanner-help-button-top
+          "
           onClick={() =>
             setShowHelp(true)
           }
@@ -381,9 +686,15 @@ export default function ScannerPage() {
           ?
         </button>
 
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
-        {/* HEADER */}
-        <header className="scanner-v3-header">
+        <header
+          className="
+            scanner-v3-header
+          "
+        >
 
           <h1>
             QR Check-in Scanner
@@ -395,14 +706,29 @@ export default function ScannerPage() {
             registrasi dan menyelesaikan
             proses check-in.
           </p>
+
         </header>
 
+        {/* =================================================
+            SCANNER CARD
+        ================================================= */}
 
-        {/* SCANNER */}
-        <section className="scanner-v3-card">
+        <section
+          className="
+            scanner-v3-card
+          "
+        >
 
-          <div className="scanner-v3-card-head">
+          {/* SCANNER HEADER */}
+
+          <div
+            className="
+              scanner-v3-card-head
+            "
+          >
+
             <div>
+
               <span>
                 Scan QR Jamaah
               </span>
@@ -410,9 +736,14 @@ export default function ScannerPage() {
               <h2>
                 Arahkan QR Code ke kamera
               </h2>
+
             </div>
+
           </div>
 
+          {/* =================================================
+              ACTUAL QR SCANNER
+          ================================================= */}
 
           <Html5QrScanner
             onScanSuccess={
@@ -420,49 +751,92 @@ export default function ScannerPage() {
             }
           />
 
+          {/* =================================================
+              PROCESSING
+          ================================================= */}
 
           {checkingIn && (
-            <div className="scanner-v3-processing">
+            <div
+              className="
+                scanner-v3-processing
+              "
+            >
               Memproses check-in...
             </div>
           )}
 
+          {/* =================================================
+              ERROR
+          ================================================= */}
 
           {error && (
-            <div className="scanner-v3-feedback scanner-v3-feedback-error">
+            <div
+              className="
+                scanner-v3-feedback
+                scanner-v3-feedback-error
+              "
+            >
 
               <div>
-                <span className="scanner-v3-feedback-label">
+
+                <span
+                  className="
+                    scanner-v3-feedback-label
+                  "
+                >
                   Check-in Gagal
                 </span>
 
                 <strong>
                   QR Code tidak dapat diproses
                 </strong>
+
               </div>
 
-              <div className="scanner-v3-feedback-data">
+              <div
+                className="
+                  scanner-v3-feedback-data
+                "
+              >
+
                 <span>
                   {error}
                 </span>
+
               </div>
 
             </div>
           )}
 
+          {/* =================================================
+              RESULT
+          ================================================= */}
 
           {result && (
             <div
               className={
                 result.status ===
                 'success'
-                  ? 'scanner-v3-feedback scanner-v3-feedback-success'
-                  : 'scanner-v3-feedback scanner-v3-feedback-already'
+                  ? `
+                    scanner-v3-feedback
+                    scanner-v3-feedback-success
+                  `
+                  : `
+                    scanner-v3-feedback
+                    scanner-v3-feedback-already
+                  `
               }
             >
 
+              {/* RESULT STATUS + NAME */}
+
               <div>
-                <span className="scanner-v3-feedback-label">
+
+                <span
+                  className="
+                    scanner-v3-feedback-label
+                  "
+                >
 
                   {result.status ===
                   'success'
@@ -473,53 +847,79 @@ export default function ScannerPage() {
 
                 <strong>
                   {
-                    result.registration
+                    result
+                      .registration
                       .full_name
                   }
                 </strong>
+
               </div>
 
+              {/* RESULT DATA */}
 
-              <div className="scanner-v3-feedback-data">
+              <div
+                className="
+                  scanner-v3-feedback-data
+                "
+              >
 
-                {/* JENIS TIKET */}
+                {/* TICKET TYPE */}
+
                 <span>
                   Tiket:{' '}
+
                   {
-                    result.registration
+                    result
+                      .registration
                       .ticket_type ??
                     (
-                      result.registration.id
-                        .startsWith('VIP-')
+                      result
+                        .registration
+                        .id
+                        .startsWith(
+                          'VIP-'
+                        )
                         ? 'VIP'
                         : 'UMUM'
                     )
                   }
                 </span>
 
+                {/* GENDER */}
+
                 <span>
                   {
-                    result.registration
+                    result
+                      .registration
                       .gender
                   }
                 </span>
 
+                {/* CITY */}
+
                 <span>
                   {
-                    result.registration
+                    result
+                      .registration
                       .city
                   }
                 </span>
 
-                {result.registration
-                  .institution && (
-                  <span>
-                    {
-                      result.registration
-                        .institution
-                    }
-                  </span>
-                )}
+                {/* INSTITUTION */}
+
+                {
+                  result
+                    .registration
+                    .institution && (
+                    <span>
+                      {
+                        result
+                          .registration
+                          .institution
+                      }
+                    </span>
+                  )
+                }
 
               </div>
 
@@ -528,13 +928,24 @@ export default function ScannerPage() {
 
         </section>
 
+        {/* =================================================
+            ATTENDANCE
+        ================================================= */}
 
-        {/* ATTENDANCE */}
-        <section className="scanner-progress-card">
+        <section
+          className="
+            scanner-progress-card
+          "
+        >
 
-          <div className="scanner-progress-top">
+          <div
+            className="
+              scanner-progress-top
+            "
+          >
 
             <div>
+
               <span>
                 Kehadiran Jamaah
               </span>
@@ -546,21 +957,34 @@ export default function ScannerPage() {
                   / {stats.total}
                 </small>
               </strong>
+
             </div>
 
-            <div className="scanner-progress-percent">
+            <div
+              className="
+                scanner-progress-percent
+              "
+            >
               {progress}%
             </div>
 
           </div>
 
+          {/* PROGRESS BAR */}
 
-          <div className="scanner-progress-track">
+          <div
+            className="
+              scanner-progress-track
+            "
+          >
 
             <div
-              className="scanner-progress-fill"
+              className="
+                scanner-progress-fill
+              "
               style={{
-                width: `${progress}%`,
+                width:
+                  `${progress}%`,
               }}
             />
 
@@ -568,19 +992,26 @@ export default function ScannerPage() {
 
         </section>
 
+        {/* =================================================
+            HISTORY TOGGLE
+        ================================================= */}
 
-        {/* HISTORY */}
         <section
-          className={`scan-history-card ${
-            historyOpen
-              ? 'is-open'
-              : ''
-          }`}
+          className={`
+            scan-history-card
+            ${
+              historyOpen
+                ? 'is-open'
+                : ''
+            }
+          `}
         >
 
           <button
             type="button"
-            className="scan-history-toggle"
+            className="
+              scan-history-toggle
+            "
             onClick={() =>
               setHistoryOpen(
                 (current) =>
@@ -592,14 +1023,26 @@ export default function ScannerPage() {
             }
           >
 
-            <span className="scan-history-toggle-icon">
+            {/* ICON */}
+
+            <span
+              className="
+                scan-history-toggle-icon
+              "
+            >
+
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 aria-hidden="true"
               >
+
                 <path
-                  d="M8 6h12M8 12h12M8 18h12"
+                  d="
+                    M8 6h12
+                    M8 12h12
+                    M8 18h12
+                  "
                   stroke="currentColor"
                   strokeWidth="1.8"
                   strokeLinecap="round"
@@ -625,11 +1068,19 @@ export default function ScannerPage() {
                   r="1.2"
                   fill="currentColor"
                 />
+
               </svg>
+
             </span>
 
+            {/* COPY */}
 
-            <span className="scan-history-toggle-copy">
+            <span
+              className="
+                scan-history-toggle-copy
+              "
+            >
+
               <strong>
                 Riwayat Scan
               </strong>
@@ -637,16 +1088,25 @@ export default function ScannerPage() {
               <small>
                 Lihat hasil check-in terbaru
               </small>
+
             </span>
 
+            {/* COUNT */}
 
-            <span className="scan-history-count">
+            <span
+              className="
+                scan-history-count
+              "
+            >
               {currentHistory.length}
             </span>
 
+            {/* CHEVRON */}
 
             <span
-              className="scan-history-chevron"
+              className="
+                scan-history-chevron
+              "
               aria-hidden="true"
             >
               ›
@@ -656,27 +1116,42 @@ export default function ScannerPage() {
 
         </section>
 
+        {/* =================================================
+            HISTORY SIDE DRAWER
+        ================================================= */}
 
-        {/* HISTORY SIDE PANEL */}
         {historyOpen && (
           <div
-            className="scan-history-drawer-backdrop"
+            className="
+              scan-history-drawer-backdrop
+            "
             onClick={() =>
               setHistoryOpen(false)
             }
           >
 
             <aside
-              className="scan-history-drawer"
+              className="
+                scan-history-drawer
+              "
               onClick={(event) =>
                 event.stopPropagation()
               }
               aria-label="Riwayat Scan"
             >
 
-              <div className="scan-history-drawer-head">
+              {/* ===========================================
+                  DRAWER HEADER
+              =========================================== */}
+
+              <div
+                className="
+                  scan-history-drawer-head
+                "
+              >
 
                 <div>
+
                   <span>
                     Riwayat Scan
                   </span>
@@ -689,47 +1164,85 @@ export default function ScannerPage() {
                     {currentHistory.length}{' '}
                     aktivitas terakhir
                   </p>
+
                 </div>
 
+                {/* CLOSE */}
 
                 <button
                   type="button"
-                  className="scan-history-drawer-close"
+                  className="
+                    scan-history-drawer-close
+                  "
                   onClick={() =>
-                    setHistoryOpen(false)
+                    setHistoryOpen(
+                      false
+                    )
                   }
-                  aria-label="Tutup riwayat scan"
+                  aria-label="
+                    Tutup riwayat scan
+                  "
                 >
                   ×
                 </button>
 
               </div>
 
+              {/* ===========================================
+                  DRAWER BODY
+              =========================================== */}
 
-              <div className="scan-history-drawer-body">
+              <div
+                className="
+                  scan-history-drawer-body
+                "
+              >
+
+                {/* EMPTY */}
 
                 {currentHistory.length ===
                 0 ? (
 
-                  <div className="scan-history-empty">
-                    Belum ada aktivitas scan pada sesi ini.
+                  <div
+                    className="
+                      scan-history-empty
+                    "
+                  >
+                    Belum ada aktivitas
+                    scan pada sesi ini.
                   </div>
 
                 ) : (
 
-                  <div className="scan-history-list scan-history-list-drawer">
+                  <div
+                    className="
+                      scan-history-list
+                      scan-history-list-drawer
+                    "
+                  >
 
                     {currentHistory.map(
                       (item) => (
 
                         <div
-                          className="scan-history-item scan-history-item-drawer"
-                          key={item.id}
+                          className="
+                            scan-history-item
+                            scan-history-item-drawer
+                          "
+                          key={
+                            item.id
+                          }
                         >
 
-                          {/* STATUS ICON */}
+                          {/* =================================
+                              STATUS ICON
+                          ================================= */}
+
                           <div
-                            className={`scan-history-status scan-history-status-${item.status}`}
+                            className={`
+                              scan-history-status
+                              scan-history-status-${item.status}
+                            `}
                           >
 
                             {item.status ===
@@ -740,12 +1253,17 @@ export default function ScannerPage() {
                                 fill="none"
                                 aria-hidden="true"
                               >
+
                                 <path
-                                  d="M8 8L16 16M16 8L8 16"
+                                  d="
+                                    M8 8L16 16
+                                    M16 8L8 16
+                                  "
                                   stroke="currentColor"
                                   strokeWidth="2.2"
                                   strokeLinecap="round"
                                 />
+
                               </svg>
 
                             ) : (
@@ -755,31 +1273,45 @@ export default function ScannerPage() {
                                 fill="none"
                                 aria-hidden="true"
                               >
+
                                 <path
-                                  d="M7.5 12.5L10.4 15.4L16.8 9"
+                                  d="
+                                    M7.5 12.5
+                                    L10.4 15.4
+                                    L16.8 9
+                                  "
                                   stroke="currentColor"
                                   strokeWidth="2.2"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                 />
+
                               </svg>
 
                             )}
 
                           </div>
 
+                          {/* =================================
+                              NAME + STATUS
+                          ================================= */}
 
-                          {/* NAME + STATUS */}
-                          <div className="scan-history-info">
+                          <div
+                            className="
+                              scan-history-info
+                            "
+                          >
 
                             <strong>
                               {item.name}
                             </strong>
 
                             <span>
+
                               {item.ticketType
                                 ? `Tiket ${item.ticketType} · `
                                 : ''}
+
                               {item.status ===
                               'success'
                                 ? 'Check-in berhasil'
@@ -788,21 +1320,26 @@ export default function ScannerPage() {
                                   ? 'Sudah pernah check-in'
                                   : item.message ||
                                     'QR tidak valid'}
+
                             </span>
 
                           </div>
 
+                          {/* =================================
+                              TIME
+                          ================================= */}
 
-                          {/* TIME */}
                           <time>
                             {item.time}
                           </time>
 
                         </div>
+
                       )
                     )}
 
                   </div>
+
                 )}
 
               </div>
@@ -812,42 +1349,63 @@ export default function ScannerPage() {
           </div>
         )}
 
+        {/* =================================================
+            BOTTOM CONTROLS
+        ================================================= */}
 
-        {/* BOTTOM CONTROLS */}
-        <div className="scanner-bottom-actions">
+        <div
+          className="
+            scanner-bottom-actions
+          "
+        >
+
           <StaffLogoutButton />
+
         </div>
 
       </div>
 
+      {/* ===================================================
+          HELP MODAL
+      =================================================== */}
 
-      {/* HELP MODAL */}
       {showHelp && (
         <div
-          className="scanner-help-backdrop"
+          className="
+            scanner-help-backdrop
+          "
           onClick={() =>
             setShowHelp(false)
           }
         >
 
           <div
-            className="scanner-help-modal"
+            className="
+              scanner-help-modal
+            "
             onClick={(event) =>
               event.stopPropagation()
             }
           >
 
+            {/* CLOSE */}
+
             <button
               type="button"
-              className="scanner-help-close"
+              className="
+                scanner-help-close
+              "
               onClick={() =>
                 setShowHelp(false)
               }
-              aria-label="Tutup panduan"
+              aria-label="
+                Tutup panduan
+              "
             >
               ×
             </button>
 
+            {/* TITLE */}
 
             <span>
               Panduan Scanner
@@ -857,11 +1415,14 @@ export default function ScannerPage() {
               Cara melakukan check-in
             </h2>
 
+            {/* STEPS */}
 
             <ol>
 
               <li>
-                <strong>1.</strong>{' '}
+                <strong>
+                  1.
+                </strong>{' '}
                 Klik{' '}
                 <strong>
                   Buka Kamera
@@ -869,25 +1430,33 @@ export default function ScannerPage() {
               </li>
 
               <li>
-                <strong>2.</strong>{' '}
+                <strong>
+                  2.
+                </strong>{' '}
                 Izinkan browser
                 menggunakan kamera.
               </li>
 
               <li>
-                <strong>3.</strong>{' '}
+                <strong>
+                  3.
+                </strong>{' '}
                 Arahkan QR Code jamaah
                 ke area scanner.
               </li>
 
               <li>
-                <strong>4.</strong>{' '}
+                <strong>
+                  4.
+                </strong>{' '}
                 Tunggu hingga hasil
                 check-in muncul.
               </li>
 
               <li>
-                <strong>5.</strong>{' '}
+                <strong>
+                  5.
+                </strong>{' '}
                 Jika kamera bermasalah,
                 gunakan tombol{' '}
                 <strong>

@@ -42,8 +42,21 @@ export async function GET() {
       );
     }
 
+    /*
+     * Tambahkan ticket_type dari sisi API.
+     *
+     * Database tetap tidak diubah.
+     */
+
+    const registrations = (data ?? []).map(
+      (registration) => ({
+        ...registration,
+        ticket_type: 'VIP' as const,
+      })
+    );
+
     return NextResponse.json({
-      registrations: data ?? [],
+      registrations,
     });
   } catch (error) {
     console.error(
@@ -105,7 +118,8 @@ export async function DELETE(
 
       return NextResponse.json(
         {
-          error: 'Gagal menghapus data peserta VIP.',
+          error:
+            'Gagal menghapus data peserta VIP.',
         },
         {
           status: 500,
@@ -117,7 +131,6 @@ export async function DELETE(
       success: true,
       registration: data,
     });
-
   } catch (error) {
     console.error(
       'Delete VIP registration route error:',
@@ -126,7 +139,8 @@ export async function DELETE(
 
     return NextResponse.json(
       {
-        error: 'Terjadi kesalahan pada server.',
+        error:
+          'Terjadi kesalahan pada server.',
       },
       {
         status: 500,

@@ -48,8 +48,26 @@ export async function GET(request: NextRequest) {
         );
       }
 
+      /*
+       * Tambahkan ticket_type dari sisi API.
+       *
+       * Tidak mengubah database.
+       *
+       * Page scanner membutuhkan field ini
+       * untuk menampilkan:
+       *
+       * Tiket: UMUM
+       */
+
+      const registrations = (data ?? []).map(
+        (registration) => ({
+          ...registration,
+          ticket_type: 'UMUM' as const,
+        })
+      );
+
       return NextResponse.json({
-        registrations: data ?? [],
+        registrations,
       });
     }
 
@@ -97,8 +115,24 @@ export async function GET(request: NextRequest) {
         );
       }
 
+      /*
+       * Tambahkan ticket_type dari sisi API.
+       *
+       * Tidak mengubah database.
+       *
+       * Ini membuat data VIP konsisten
+       * dengan response /api/checkin.
+       */
+
+      const registrations = (data ?? []).map(
+        (registration) => ({
+          ...registration,
+          ticket_type: 'VIP' as const,
+        })
+      );
+
       return NextResponse.json({
-        registrations: data ?? [],
+        registrations,
       });
     }
 
@@ -114,7 +148,6 @@ export async function GET(request: NextRequest) {
         status: 400,
       }
     );
-
   } catch (error) {
     console.error(
       'Admin registrations route error:',
@@ -197,7 +230,6 @@ export async function DELETE(
       success: true,
       registration: data,
     });
-
   } catch (error) {
     console.error(
       'Delete registration route error:',

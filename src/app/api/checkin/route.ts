@@ -3,27 +3,45 @@ import { supabaseAdmin } from '@/lib/supabaseClient';
 
 export async function POST(request: Request) {
   try {
-    const { id } = await request.json();
+    // =====================================================
+    // AMBIL ID DARI QR
+    // =====================================================
+
+    const body = await request.json();
+    const { id } = body;
 
     if (!id || typeof id !== 'string') {
       return NextResponse.json(
-        { error: 'QR code tidak terbaca dengan benar.' },
+        {
+          error:
+            'QR code tidak terbaca dengan benar.',
+        },
         { status: 400 }
       );
     }
 
     const ticketId = id.trim();
 
-    /*
-     * Tentukan jenis tiket dari prefix ID.
-     *
-     * UMUM-XXXXXXXX → registrations
-     * VIP-XXXXXXXX   → registrations_vip
-     *
-     * Untuk ID lama yang masih UUID, kita tetap
-     * coba cari ke registrations agar data lama
-     * tidak langsung rusak.
-     */
+    if (!ticketId) {
+      return NextResponse.json(
+        {
+          error:
+            'QR code tidak terbaca dengan benar.',
+        },
+        { status: 400 }
+      );
+    }
+
+    // =====================================================
+    // TENTUKAN JENIS TIKET
+    // =====================================================
+    //
+    // VIP-XXXXXXXX → registrations_vip
+    // UMUM-XXXXXXXX → registrations
+    //
+    // Kalau ID lama masih UUID, tetap diarahkan
+    // ke registrations agar data lama tidak rusak.
+    // =====================================================
 
     const isVip = ticketId.startsWith('VIP-');
 
@@ -31,18 +49,24 @@ export async function POST(request: Request) {
       ? 'registrations_vip'
       : 'registrations';
 
-    const ticketType = isVip ? 'VIP' : 'UMUM';
+    const ticketType = isVip
+      ? 'VIP'
+      : 'UMUM';
 
-    // =========================
-    // CARI REGISTRASI
-    // =========================
+    // =====================================================
+    // CARI DATA REGISTRASI
+    // =====================================================
 
-    const { data: reg, error: fetchError } =
+    const { data: registration, error: fetchError } =
       await supabaseAdmin
         .from(tableName)
         .select('*')
         .eq('id', ticketId)
         .maybeSingle();
+
+    // =====================================================
+    // ERROR DATABASE
+    // =====================================================
 
     if (fetchError) {
       console.error(
@@ -59,7 +83,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!reg) {
+    // =====================================================
+    // DATA TIDAK DITEMUKAN
+    // =====================================================
+
+    if (!registration) {
       return NextResponse.json(
         {
           error:
@@ -69,25 +97,44 @@ export async function POST(request: Request) {
       );
     }
 
-    // =========================
-    // SUDAH CHECK-IN
-    // =========================
+    // =====================================================
+    // DATA REGISTRASI LENGKAP
+    // =====================================================
+    //
+    // ticket_type dipastikan selalu dikirim ke frontend.
+    // Ini penting supaya page scanner dan drawer
+    // bisa mengetahui apakah tiket UMUM atau VIP.
+    // =====================================================
 
-    if (reg.checked_in) {
+    const registrationWithTicketType = {
+      ...registration,
+      ticket_type:
+        registration.ticket_type ??
+        ticketType,
+    };
+
+    // =====================================================
+    // CEK APAKAH SUDAH CHECK-IN
+    // =====================================================
+
+    if (registration.checked_in === true) {
+      console.log(
+        `QR sudah pernah check-in: ${ticketId}`
+      );
+
       return NextResponse.json({
         status: 'already_checked_in',
-        registration: {
-          ...reg,
-          ticket_type: ticketType,
-        },
+
+        registration:
+          registrationWithTicketType,
       });
     }
 
-    // =========================
+    // =====================================================
     // CHECK-IN
-    // =========================
+    // =====================================================
 
-    const { data: updated, error: updateError } =
+    const { data: updatedRegistration, error: updateError } =
       await supabaseAdmin
         .from(tableName)
         .update({
@@ -96,21 +143,115 @@ export async function POST(request: Request) {
             new Date().toISOString(),
         })
         .eq('id', ticketId)
-        .select()
-        .single();
+        .eq('checked_in', false)
+        .select('*')
+        .maybeSingle();
+
+    // =====================================================
+    // ERROR UPDATE
+    // =====================================================
 
     if (updateError) {
-      throw updateError;
+      console.error(
+        'Update check-in error:',
+        updateError
+      );
+
+      return NextResponse.json(
+        {
+          error:
+            'Check-in gagal disimpan. Silakan coba lagi.',
+        },
+        { status: 500 }
+      );
     }
+
+    // =====================================================
+    // KONDISI RACE / SUDAH CHECK-IN
+    // =====================================================
+    //
+    // Misalnya QR terbaca dua kali hampir bersamaan.
+    // Request pertama berhasil update.
+    // Request kedua bisa tidak mendapatkan row
+    // karena checked_in sudah berubah menjadi true.
+    //
+    // Dalam kondisi ini kita ambil ulang datanya
+    // dan tetap mengembalikan already_checked_in.
+    // =====================================================
+
+    if (!updatedRegistration) {
+      const { data: latestRegistration, error: latestError } =
+        await supabaseAdmin
+          .from(tableName)
+          .select('*')
+          .eq('id', ticketId)
+          .maybeSingle();
+
+      if (latestError) {
+        console.error(
+          'Fetch latest registration error:',
+          latestError
+        );
+
+        return NextResponse.json(
+          {
+            error:
+              'Status check-in tidak dapat diperiksa.',
+          },
+          { status: 500 }
+        );
+      }
+
+      if (
+        latestRegistration &&
+        latestRegistration.checked_in === true
+      ) {
+        return NextResponse.json({
+          status: 'already_checked_in',
+
+          registration: {
+            ...latestRegistration,
+
+            ticket_type:
+              latestRegistration.ticket_type ??
+              ticketType,
+          },
+        });
+      }
+
+      return NextResponse.json(
+        {
+          error:
+            'Check-in gagal diproses. Silakan coba lagi.',
+        },
+        { status: 500 }
+      );
+    }
+
+    // =====================================================
+    // CHECK-IN BERHASIL
+    // =====================================================
+
+    console.log(
+      `Check-in berhasil: ${ticketId}`
+    );
 
     return NextResponse.json({
       status: 'success',
+
       registration: {
-        ...updated,
-        ticket_type: ticketType,
+        ...updatedRegistration,
+
+        ticket_type:
+          updatedRegistration.ticket_type ??
+          ticketType,
       },
     });
   } catch (err: unknown) {
+    // =====================================================
+    // GENERAL ERROR
+    // =====================================================
+
     console.error(
       'POST /api/checkin error:',
       err
@@ -122,7 +263,9 @@ export async function POST(request: Request) {
         : 'Terjadi kesalahan pada server.';
 
     return NextResponse.json(
-      { error: message },
+      {
+        error: message,
+      },
       { status: 500 }
     );
   }
