@@ -7590,6 +7590,43 @@ body {
     );
 }
 
+.scanner-progress-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.scanner-progress-breakdown-item {
+  padding: 13px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.scanner-progress-breakdown-item span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.scanner-progress-breakdown-item strong {
+  display: block;
+  font-family: var(--font-heading), serif;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.scanner-progress-breakdown-item small {
+  margin-left: 3px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
 /* ==================================================
    SCANNER BACKGROUND DECORATION
 ================================================== */

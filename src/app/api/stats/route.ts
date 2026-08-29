@@ -1,38 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseClient';
 
-export async function GET(
-  request: NextRequest
-) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } =
-      new URL(request.url);
+    const { searchParams } = new URL(request.url);
 
     /*
-     * Default:
-     * UMUM
+     * =====================================================
+     * TYPE STATISTICS
      *
-     * /api/stats
-     * /api/stats?type=umum
+     * ?type=umum  → registrations
+     * ?type=vip   → registrations_vip
      *
-     * Keduanya membaca registrations saja.
+     * Default = umum
+     *
+     * PENTING:
+     * Route ini TIDAK menjumlahkan UMUM + VIP.
+     * Supaya Dashboard Admin UMUM tetap membaca
+     * data registrations saja.
+     * =====================================================
      */
 
-    const type =
-      searchParams.get('type') || 'umum';
+    const type = searchParams.get('type') || 'umum';
 
     // =====================================================
     // VALIDASI TYPE
     // =====================================================
 
-    if (
-      type !== 'umum' &&
-      type !== 'vip'
-    ) {
+    if (type !== 'umum' && type !== 'vip') {
       return NextResponse.json(
         {
-          error:
-            'Tipe statistik tidak valid.',
+          error: 'Tipe statistik tidak valid.',
         },
         {
           status: 400,
@@ -50,13 +48,10 @@ export async function GET(
         : 'registrations';
 
     // =====================================================
-    // AMBIL DATA SESUAI TYPE
+    // AMBIL DATA
     // =====================================================
 
-    const {
-      data,
-      error,
-    } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from(tableName)
       .select('checked_in');
 
@@ -80,22 +75,21 @@ export async function GET(
     }
 
     // =====================================================
-    // HITUNG STATISTIK
+    // HITUNG
     // =====================================================
 
     const rows = data ?? [];
 
-    const total =
-      rows.length;
+    const total = rows.length;
 
-    const checkedIn =
-      rows.filter(
-        (row) =>
-          row.checked_in === true
-      ).length;
+    const checkedIn = rows.filter(
+      (row) => row.checked_in === true
+    ).length;
 
     // =====================================================
     // RESPONSE
+    //
+    // HANYA DATA DARI TABLE YANG DIPILIH
     // =====================================================
 
     return NextResponse.json({
@@ -103,7 +97,6 @@ export async function GET(
       checkedIn,
       total,
     });
-
   } catch (error) {
     console.error(
       'GET /api/stats error:',

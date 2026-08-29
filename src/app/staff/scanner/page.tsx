@@ -94,46 +94,123 @@ export default function ScannerPage() {
     useState<ScanHistoryItem[]>([]);
 
   const [stats, setStats] = useState({
-    checkedIn: 0,
-    total: 0,
-  });
+  checkedIn: 0,
+  total: 0,
+  umumCheckedIn: 0,
+  umumTotal: 0,
+  vipCheckedIn: 0,
+  vipTotal: 0,
+});
 
   // =========================================================
   // LOAD STATS
   // =========================================================
 
   const loadStats = useCallback(async () => {
-    try {
-      const response = await fetch(
-        '/api/stats',
+  try {
+    // =====================================================
+    // AMBIL STATS UMUM + VIP
+    // =====================================================
+
+    const [
+      umumResponse,
+      vipResponse,
+    ] = await Promise.all([
+      fetch(
+        '/api/stats?type=umum',
         {
           cache: 'no-store',
         }
-      );
+      ),
 
-      const data =
-        await response.json();
+      fetch(
+        '/api/stats?type=vip',
+        {
+          cache: 'no-store',
+        }
+      ),
+    ]);
 
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            'Gagal memuat statistik.'
-        );
-      }
+    const umumData =
+      await umumResponse.json();
 
-      setStats({
-        checkedIn:
-          data.checkedIn,
-        total:
-          data.total,
-      });
-    } catch (err) {
-      console.error(
-        'Load stats error:',
-        err
+    const vipData =
+      await vipResponse.json();
+
+    // =====================================================
+    // VALIDASI
+    // =====================================================
+
+    if (!umumResponse.ok) {
+      throw new Error(
+        umumData.error ||
+          'Gagal memuat statistik tiket umum.'
       );
     }
-  }, []);
+
+    if (!vipResponse.ok) {
+      throw new Error(
+        vipData.error ||
+          'Gagal memuat statistik tiket VIP.'
+      );
+    }
+
+    // =====================================================
+    // STATS UMUM
+    // =====================================================
+
+    const umumCheckedIn =
+      umumData.checkedIn ?? 0;
+
+    const umumTotal =
+      umumData.total ?? 0;
+
+    // =====================================================
+    // STATS VIP
+    // =====================================================
+
+    const vipCheckedIn =
+      vipData.checkedIn ?? 0;
+
+    const vipTotal =
+      vipData.total ?? 0;
+
+    // =====================================================
+    // TOTAL KESELURUHAN SCANNER
+    //
+    // HANYA DI SINI UMUM + VIP DIJUMLAHKAN
+    // =====================================================
+
+    const checkedIn =
+      umumCheckedIn +
+      vipCheckedIn;
+
+    const total =
+      umumTotal +
+      vipTotal;
+
+    // =====================================================
+    // SET STATE
+    // =====================================================
+
+    setStats({
+      checkedIn,
+      total,
+
+      umumCheckedIn,
+      umumTotal,
+
+      vipCheckedIn,
+      vipTotal,
+    });
+
+  } catch (err) {
+    console.error(
+      'Load scanner stats error:',
+      err
+    );
+  }
+}, []);
 
   // =========================================================
   // LOAD HISTORY
@@ -932,65 +1009,71 @@ export default function ScannerPage() {
             ATTENDANCE
         ================================================= */}
 
-        <section
-          className="
-            scanner-progress-card
-          "
-        >
+        <section className="scanner-progress-card">
 
-          <div
-            className="
-              scanner-progress-top
-            "
-          >
+  <div className="scanner-progress-top">
 
-            <div>
+    <div>
 
-              <span>
-                Kehadiran Jamaah
-              </span>
+      <span>
+        Kehadiran Jamaah
+      </span>
 
-              <strong>
-                {stats.checkedIn}
+      <strong>
+        {stats.checkedIn}
 
-                <small>
-                  / {stats.total}
-                </small>
-              </strong>
+        <small>
+          / {stats.total}
+        </small>
+      </strong>
 
-            </div>
+    </div>
 
-            <div
-              className="
-                scanner-progress-percent
-              "
-            >
-              {progress}%
-            </div>
+    <div className="scanner-progress-percent">
+      {progress}%
+    </div>
 
-          </div>
+  </div>
 
-          {/* PROGRESS BAR */}
+  <div className="scanner-progress-track">
 
-          <div
-            className="
-              scanner-progress-track
-            "
-          >
+    <div
+      className="scanner-progress-fill"
+      style={{
+        width: `${progress}%`,
+      }}
+    />
 
-            <div
-              className="
-                scanner-progress-fill
-              "
-              style={{
-                width:
-                  `${progress}%`,
-              }}
-            />
+  </div>
 
-          </div>
+  {/* BREAKDOWN TIKET */}
+  <div className="scanner-progress-breakdown">
 
-        </section>
+  <div className="scanner-progress-breakdown-item">
+    <span>UMUM</span>
+
+    <strong>
+      {stats.umumCheckedIn}
+      <small>
+        / {stats.umumTotal}
+      </small>
+    </strong>
+  </div>
+
+  <div className="scanner-progress-breakdown-item">
+    <span>VIP</span>
+
+    <strong>
+      {stats.vipCheckedIn}
+      <small>
+        / {stats.vipTotal}
+      </small>
+    </strong>
+  </div>
+
+</div>
+
+</section>
 
         {/* =================================================
             HISTORY TOGGLE
