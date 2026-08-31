@@ -471,6 +471,44 @@ export default function RegisterVipPage() {
 
         </header>
 
+        {/* ======================
+    PARTNERS / SUPPORTERS
+====================== */}
+
+<section className="register-partners-card">
+
+  <div className="register-partners-heading">
+    <span className="register-partners-kicker">
+      Didukung Oleh
+    </span>
+  </div>
+
+  <div className="register-partners-logos">
+
+    <div className="register-partner-logo">
+      <img
+        src="/image/logo_biofarma.png"
+        alt="Bio Farma"
+      />
+    </div>
+
+    <div className="register-partner-logo">
+      <img
+        src="/image/logo_jc.png"
+        alt="JC"
+      />
+    </div>
+
+    <div className="register-partner-logo">
+      <img
+        src="/image/logo-triman.png"
+        alt="Triman"
+      />
+    </div>
+
+  </div>
+
+</section>
 
         {/* ======================
             CONTENT
