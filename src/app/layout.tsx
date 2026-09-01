@@ -28,9 +28,7 @@ export const metadata: Metadata = {
 
   creator: 'Aliyah Alfita Rossa',
 
-  icons: {
-    icon: '/image/icon.png',
-  },
+  
 
   openGraph: {
     title: 'Pengajian Akbar MT MHABD 2026',
