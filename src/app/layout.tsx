@@ -28,7 +28,10 @@ export const metadata: Metadata = {
 
   creator: 'Aliyah Alfita Rossa',
 
-  
+  icons: {
+    icon: '/favicon.ico?v=2',
+    shortcut: '/favicon.ico?v=2',
+  },
 
   openGraph: {
     title: 'Pengajian Akbar MT MHABD 2026',
@@ -37,6 +40,7 @@ export const metadata: Metadata = {
     siteName: 'Pengajian Akbar MT MHABD 2026',
     locale: 'id_ID',
     type: 'website',
+
     images: [
       {
         url: '/image/poster.png',
@@ -45,6 +49,13 @@ export const metadata: Metadata = {
         alt: 'Pengajian Akbar MT MHABD 2026',
       },
     ],
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pengajian Akbar MT MHABD 2026',
+    description: 'Registrasi Pengajian Akbar MT MHABD 2026',
+    images: ['/image/poster.png'],
   },
 };
 
