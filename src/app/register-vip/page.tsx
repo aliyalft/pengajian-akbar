@@ -1784,7 +1784,7 @@ export default function RegisterVipPage() {
             href="https://www.linkedin.com/in/aliyahalfitarossa"
             aria-label="Website Aliyah"
           >
-            Aliyah
+            Aliyah Alfita Rossa
           </a>
         </p>
 

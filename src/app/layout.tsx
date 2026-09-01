@@ -15,8 +15,39 @@ const notoSans = Noto_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://mhabd.web.id'),
+
   title: 'Pengajian Akbar',
-  description: 'Registrasi Pengajian Akbar',
+  description: 'Registrasi Pengajian Akbar MT MHABD 2026',
+
+  authors: [
+    {
+      name: 'Aliyah Alfita Rossa',
+    },
+  ],
+
+  creator: 'Aliyah Alfita Rossa',
+
+  icons: {
+    icon: '/image/icon.png',
+  },
+
+  openGraph: {
+    title: 'Pengajian Akbar MT MHABD 2026',
+    description: 'Registrasi Pengajian Akbar MT MHABD 2026',
+    url: 'https://mhabd.web.id',
+    siteName: 'Pengajian Akbar MT MHABD 2026',
+    locale: 'id_ID',
+    type: 'website',
+    images: [
+      {
+        url: '/image/poster.png',
+        width: 1200,
+        height: 630,
+        alt: 'Pengajian Akbar MT MHABD 2026',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
