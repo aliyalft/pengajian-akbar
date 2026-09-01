@@ -758,15 +758,15 @@ export default async function TicketVipPage({
           border-color: rgba(18, 58, 99, 0.18) !important;
         }
 
-        /* garis putus-putus pemisah & footer */
-        .ticket-page-vip .ticket-dashed-divider {
-          border-color: rgba(18, 58, 99, 0.25) !important;
-        }
-
         .ticket-page-vip .event-ticket-footer {
-          border-color: rgba(18, 58, 99, 0.12) !important;
-          color: #123a63 !important;
-        }
+  background: #123a63 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f7f1df !important;
+}
+
+.ticket-page-vip .event-ticket-footer span {
+  color: #f7f1df !important;
+}
 
         /* frame QR & label kecil ikut aksen navy */
         .ticket-page-vip .ticket-qr-frame {

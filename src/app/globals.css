@@ -11566,3 +11566,23 @@ body {
 
 }
 
+.register-v2-event-title {
+  position: relative;
+  z-index: 3;
+
+  margin: 8px 0 16px;
+
+  font-family: var(--font-heading), serif;
+
+  font-size: clamp(1.9rem, 3vw, 3rem);
+
+  line-height: 1;
+
+  letter-spacing: -0.035em;
+
+  font-weight: 600;
+
+  text-align: center;
+
+  color: #086b4f;
+}

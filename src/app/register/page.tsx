@@ -279,9 +279,6 @@ export default function RegisterPage() {
 
               <div className="mosque-main">
 
-                <div className="mosque-crescent">
-                  ☾
-                </div>
 
                 <div className="mosque-main-dome" />
 
@@ -301,10 +298,10 @@ export default function RegisterPage() {
 
               <h1
                 className="register-v2-heading manual-spacing"
-                aria-label="Registrasi Kehadiran"
+                aria-label="Pengajian Akbar"
               >
 
-                {'Registrasi Kehadiran'
+                {'Pengajian Akbar'
                   .split('')
                   .map(
                     (
@@ -328,7 +325,10 @@ export default function RegisterPage() {
                   )}
 
               </h1>
-
+              
+              <h2 className="register-v2-event-title">
+              MT MHABD
+            </h2>
 
               <div className="register-v2-heading-line" />
 
