@@ -33,11 +33,15 @@ export default function StaffLoginPage() {
           password,
         });
 
-      if (error) {
+      if (error) 
         throw error;
-      }
 
-      router.replace('/staff/scanner');
+      const from = new URLSearchParams(window.location.search).get('from');
+
+      const destination =
+        from === 'dashboard' ? '/staff/dashboard' : '/staff/scanner';
+
+      router.replace(destination);
       router.refresh();
     } catch (err) {
       setError(
