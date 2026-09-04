@@ -10993,8 +10993,8 @@ body {
 
 
 /* =============================================
-   PARTNERS / SPONSORS CARD
-   Soft Green Gradient
+   PARTNERS / SPONSORS
+   Horizontal Auto-Marquee
 ============================================= */
 
 .register-partners-card {
@@ -11010,7 +11010,6 @@ body {
 
   overflow: hidden;
 
-  /* SOFT LIGHT GREEN */
   background:
     linear-gradient(
       135deg,
@@ -11046,7 +11045,7 @@ body {
 
 
 /* =============================================
-   SOFT DECORATIVE GLOW
+   DECORATION
 ============================================= */
 
 .register-partners-card::before {
@@ -11071,7 +11070,6 @@ body {
 
   pointer-events: none;
 }
-
 
 .register-partners-card::after {
   content: "";
@@ -11103,9 +11101,10 @@ body {
 
 .register-partners-heading {
   position: relative;
-  z-index: 2;
+  z-index: 5;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
@@ -11115,7 +11114,6 @@ body {
 
   text-align: center;
 }
-
 
 .register-partners-heading::before,
 .register-partners-heading::after {
@@ -11134,7 +11132,6 @@ body {
     );
 }
 
-
 .register-partners-heading::after {
   background:
     linear-gradient(
@@ -11143,7 +11140,6 @@ body {
       transparent
     );
 }
-
 
 .register-partners-kicker {
   display: block;
@@ -11168,34 +11164,98 @@ body {
 
 
 /* =============================================
-   LOGO GRID
+   LOGO VIEWPORT
+   IMPORTANT:
+   NO GRID HERE
 ============================================= */
 
-.register-partners-logos {
+.register-partners-card .register-partners-logos {
   position: relative;
-  z-index: 2;
+  z-index: 5;
 
-  display: grid;
+  display: block !important;
 
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+  width: 100%;
+
+  overflow: hidden;
+
+  padding: 3px 0 5px;
+
+  /* fade edges */
+  mask-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      #000 5%,
+      #000 95%,
+      transparent 100%
+    );
+
+  -webkit-mask-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      #000 5%,
+      #000 95%,
+      transparent 100%
+    );
+}
+
+
+/* =============================================
+   MOVING TRACK
+============================================= */
+
+.register-partners-card .register-partners-track {
+  display: flex !important;
+
+  flex-direction: row !important;
+
+  flex-wrap: nowrap !important;
+
+  align-items: center;
+
+  width: max-content !important;
+
+  max-width: none !important;
 
   gap: 10px;
+
+  transform: translate3d(0, 0, 0);
+
+  animation:
+    registerPartnersMarquee
+    22s
+    linear
+    infinite !important;
+
+  will-change: transform;
+
+  animation-play-state: running !important;
 }
 
 
 /* =============================================
    INDIVIDUAL LOGO CARD
-   CLEAN WHITE
 ============================================= */
 
-.register-partner-logo {
+.register-partners-card .register-partner-logo {
   position: relative;
+
+  flex: 0 0 200px !important;
+
+  width: 200px !important;
+
+  min-width: 200px !important;
+
+  max-width: 200px !important;
 
   height: 76px;
 
-  display: flex;
+  display: flex !important;
+
   align-items: center;
+
   justify-content: center;
 
   padding: 9px 14px;
@@ -11204,7 +11264,6 @@ body {
 
   border-radius: 15px;
 
-  /* PURE WHITE */
   background: #ffffff;
 
   border: 1px solid transparent;
@@ -11219,7 +11278,10 @@ body {
     );
 
   background-origin: border-box;
-  background-clip: padding-box, border-box;
+
+  background-clip:
+    padding-box,
+    border-box;
 
   box-shadow:
     0 5px 15px rgba(25, 74, 58, 0.055),
@@ -11227,16 +11289,13 @@ body {
 
   transition:
     transform 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease;
+    box-shadow 0.25s ease;
 }
 
 
-/* =============================================
-   SUBTLE TOP SHINE
-============================================= */
+/* small top highlight */
 
-.register-partner-logo::before {
+.register-partners-card .register-partner-logo::before {
   content: "";
 
   position: absolute;
@@ -11262,10 +11321,74 @@ body {
 
 
 /* =============================================
+   LOGOS
+============================================= */
+
+.register-partners-card .register-partner-logo img {
+  position: relative;
+  z-index: 1;
+
+  display: block;
+
+  width: auto;
+
+  height: auto;
+
+  max-width: 125px;
+
+  max-height: 48px;
+
+  object-fit: contain;
+
+  filter: none;
+
+  flex-shrink: 0;
+}
+
+
+/* Bio Farma
+   Original = child 1
+   Duplicate = child 8
+*/
+
+.register-partners-card .register-partner-logo:nth-child(1) img,
+.register-partners-card .register-partner-logo:nth-child(8) img {
+  width: 200px;
+
+  height: 100px;
+
+  max-width: 200px;
+
+  max-height: 100px;
+
+  object-fit: contain;
+}
+
+
+/* J&C Cookies
+   Original = child 2
+   Duplicate = child 9
+*/
+
+.register-partners-card .register-partner-logo:nth-child(2) img,
+.register-partners-card .register-partner-logo:nth-child(9) img {
+  width: 82px;
+
+  height: 58px;
+
+  max-width: 82px;
+
+  max-height: 58px;
+
+  object-fit: contain;
+}
+
+
+/* =============================================
    HOVER
 ============================================= */
 
-.register-partner-logo:hover {
+.register-partners-card .register-partner-logo:hover {
   transform: translateY(-2px);
 
   box-shadow:
@@ -11276,63 +11399,28 @@ body {
 
 
 /* =============================================
-   LOGOS
+   MARQUEE ANIMATION
 ============================================= */
 
-.register-partner-logo img {
-  position: relative;
-  z-index: 1;
+@keyframes registerPartnersMarquee {
 
-  display: block;
+  from {
+    transform: translate3d(0, 0, 0);
+  }
 
-  width: auto;
-  height: auto;
+  to {
+    transform: translate3d(
+      calc(-50% - 5px),
+      0,
+      0
+    );
+  }
 
-  max-width: 125px;
-  max-height: 48px;
-
-  object-fit: contain;
-
-  filter: none;
 }
 
 
 /* =============================================
-   BIO FARMA
-============================================= */
-
-.register-partner-logo:nth-child(1) img {
-  width: 200px;
-  height: 100px;
-
-  max-width: 200px;
-  max-height: 100px;
-
-  object-fit: contain;
-}
-
-
-/* =============================================
-   J&C COOKIES
-   Compact / almost-square logo
-============================================= */
-
-.register-partner-logo:nth-child(2) img {
-  position: relative;
-  z-index: 1;
-
-  width: 82px;
-  height: 58px;
-
-  max-width: 82px;
-  max-height: 58px;
-
-  object-fit: contain;
-}
-
-
-/* =============================================
-   MOBILE
+   TABLET / MOBILE
 ============================================= */
 
 @media (max-width: 760px) {
@@ -11340,11 +11428,9 @@ body {
   .register-partners-card {
     width: calc(100% - 32px);
 
-    margin:
-      15px auto 21px;
+    margin: 15px auto 21px;
 
-    padding:
-      16px 15px 17px;
+    padding: 16px 15px 17px;
 
     border-radius: 19px;
   }
@@ -11372,47 +11458,64 @@ body {
   }
 
 
-  .register-partners-logos {
-    gap: 8px;
+  .register-partners-card .register-partners-logos {
+    padding: 2px 0 4px;
   }
 
 
-  .register-partner-logo {
+  .register-partners-card .register-partners-track {
+    gap: 8px;
+
+    animation-duration: 18s !important;
+  }
+
+
+  .register-partners-card .register-partner-logo {
+    flex: 0 0 170px !important;
+
+    width: 170px !important;
+
+    min-width: 170px !important;
+
+    max-width: 170px !important;
+
     height: 63px;
 
-    padding:
-      7px 7px;
+    padding: 7px 7px;
 
     border-radius: 12px;
   }
 
 
-  .register-partner-logo img {
+  .register-partners-card .register-partner-logo img {
     max-width: 91px;
+
     max-height: 40px;
   }
 
 
-  /* BIO FARMA */
-
-  .register-partner-logo:nth-child(1) img {
+  .register-partners-card .register-partner-logo:nth-child(1) img,
+  .register-partners-card .register-partner-logo:nth-child(8) img {
     width: 180px;
+
     height: 80px;
 
     max-width: 180px;
+
     max-height: 80px;
 
     object-fit: contain;
   }
 
 
-  /* J&C */
-
-  .register-partner-logo:nth-child(2) img {
+  .register-partners-card .register-partner-logo:nth-child(2) img,
+  .register-partners-card .register-partner-logo:nth-child(9) img {
     width: 69px;
+
     height: 47px;
 
     max-width: 69px;
+
     max-height: 47px;
   }
 
@@ -11420,7 +11523,7 @@ body {
 
 
 /* =============================================
-   SMALL MOBILE
+   SMALL PHONE
 ============================================= */
 
 @media (max-width: 430px) {
@@ -11428,8 +11531,7 @@ body {
   .register-partners-card {
     width: calc(100% - 24px);
 
-    padding:
-      14px 11px 15px;
+    padding: 14px 11px 15px;
 
     border-radius: 17px;
   }
@@ -11457,47 +11559,59 @@ body {
   }
 
 
-  .register-partners-logos {
+  .register-partners-card .register-partners-track {
     gap: 6px;
+
+    animation-duration: 15s !important;
   }
 
 
-  .register-partner-logo {
+  .register-partners-card .register-partner-logo {
+    flex: 0 0 145px !important;
+
+    width: 145px !important;
+
+    min-width: 145px !important;
+
+    max-width: 145px !important;
+
     height: 56px;
 
-    padding:
-      6px 4px;
+    padding: 6px 4px;
 
     border-radius: 10px;
   }
 
 
-  .register-partner-logo img {
+  .register-partners-card .register-partner-logo img {
     max-width: 73px;
+
     max-height: 36px;
   }
 
 
-  /* BIO FARMA */
-
-  .register-partner-logo:nth-child(1) img {
+  .register-partners-card .register-partner-logo:nth-child(1) img,
+  .register-partners-card .register-partner-logo:nth-child(8) img {
     width: 180px;
+
     height: 80px;
 
     max-width: 180px;
+
     max-height: 80px;
 
     object-fit: contain;
   }
 
 
-  /* J&C */
-
-  .register-partner-logo:nth-child(2) img {
+  .register-partners-card .register-partner-logo:nth-child(2) img,
+  .register-partners-card .register-partner-logo:nth-child(9) img {
     width: 61px;
+
     height: 42px;
 
     max-width: 61px;
+
     max-height: 42px;
   }
 
@@ -11505,7 +11619,7 @@ body {
 
 
 /* =============================================
-   VERY SMALL SCREEN
+   VERY SMALL PHONE
 ============================================= */
 
 @media (max-width: 360px) {
@@ -11513,8 +11627,7 @@ body {
   .register-partners-card {
     width: calc(100% - 20px);
 
-    padding:
-      13px 9px 14px;
+    padding: 13px 9px 14px;
   }
 
 
@@ -11538,36 +11651,59 @@ body {
   }
 
 
-  .register-partner-logo {
+  .register-partners-card .register-partners-track {
+    gap: 6px;
+
+    animation-duration: 13s !important;
+  }
+
+
+  .register-partners-card .register-partner-logo {
+    flex: 0 0 130px !important;
+
+    width: 130px !important;
+
+    min-width: 130px !important;
+
+    max-width: 130px !important;
+
     height: 52px;
 
-    padding:
-      5px 3px;
+    padding: 5px 3px;
 
     border-radius: 9px;
   }
 
 
-  .register-partner-logo img {
+  .register-partners-card .register-partner-logo img {
     max-width: 66px;
+
     max-height: 33px;
   }
 
 
-  /* J&C */
-
-  .register-partner-logo:nth-child(2) img {
+  .register-partners-card .register-partner-logo:nth-child(2) img,
+  .register-partners-card .register-partner-logo:nth-child(9) img {
     width: 55px;
+
     height: 39px;
 
     max-width: 55px;
+
     max-height: 39px;
   }
 
 }
 
+
+/* =============================================
+   EVENT TITLE
+   Keep this as-is
+============================================= */
+
 .register-v2-event-title {
   position: relative;
+
   z-index: 3;
 
   margin: 8px 0 16px;

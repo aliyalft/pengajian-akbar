@@ -339,8 +339,8 @@ export default function RegisterPage() {
         </header>
 
         {/* ======================
-    PARTNERS / SUPPORTERS
-====================== */}
+            PARTNERS / SUPPORTERS
+        ====================== */}
 
 <section className="register-partners-card">
 
@@ -352,25 +352,110 @@ export default function RegisterPage() {
 
   <div className="register-partners-logos">
 
-    <div className="register-partner-logo">
-      <img
-        src="/image/logo_biofarma.png"
-        alt="Bio Farma"
-      />
-    </div>
+    <div className="register-partners-track">
 
-    <div className="register-partner-logo">
-      <img
-        src="/image/logo_jc.png"
-        alt="JC"
-      />
-    </div>
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo_biofarma.png"
+          alt="Bio Farma"
+        />
+      </div>
 
-    <div className="register-partner-logo">
-      <img
-        src="/image/logo-triman.png"
-        alt="Triman"
-      />
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo_jc.png"
+          alt="JC"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-triman.png"
+          alt="Triman"
+        />
+      </div>
+      
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-tactlink.png"
+          alt="TactLink"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-cw.png"
+          alt="Corak Warna"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-klinik.png"
+          alt="Klinik"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-manson.png"
+          alt="Manson"
+        />
+      </div>
+
+      
+
+      {/* DUPLICATE — untuk infinite loop */}
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo_biofarma.png"
+          alt="Bio Farma"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo_jc.png"
+          alt="JC"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-triman.png"
+          alt="Triman"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-tactlink.png"
+          alt="TactLink"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-cw.png"
+          alt="Corak Warna"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-klinik.png"
+          alt="Klinik"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-manson.png"
+          alt="Manson"
+        />
+      </div>
+
     </div>
 
   </div>
