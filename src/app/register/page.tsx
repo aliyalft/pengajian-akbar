@@ -403,6 +403,13 @@ export default function RegisterPage() {
         />
       </div>
 
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-evermos.png"
+          alt="Evermos"
+        />
+      </div>
+
       
 
       {/* DUPLICATE — untuk infinite loop */}
@@ -453,6 +460,13 @@ export default function RegisterPage() {
         <img
           src="/image/logo-manson.png"
           alt="Manson"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-evermos.png"
+          alt="Evermos"
         />
       </div>
 

@@ -539,7 +539,12 @@ export default function RegisterVipPage() {
         />
       </div>
 
-      
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-evermos.png"
+          alt="Evermos"
+        />
+      </div>
 
       {/* DUPLICATE — untuk infinite loop */}
 
@@ -589,6 +594,13 @@ export default function RegisterVipPage() {
         <img
           src="/image/logo-manson.png"
           alt="Manson"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-evermos.png"
+          alt="Evermos"
         />
       </div>
 
