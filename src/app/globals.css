@@ -11962,3 +11962,17 @@ body {
     line-height: 1.5;
   }
 }
+
+.register-closed-button {
+  background: #9e9e9e !important;
+  color: #ffffff !important;
+  cursor: not-allowed !important;
+  opacity: 0.9;
+  box-shadow: none !important;
+}
+
+.register-closed-button:hover {
+  background: #9e9e9e !important;
+  box-shadow: none !important;
+  transform: none !important;
+}

@@ -1380,7 +1380,7 @@ export default function RegisterPage() {
                 )}
 
 
-                <button
+                {/*<button
                   type="submit"
                   disabled={submitting}
                   className="btn btn-primary w-full mt-32"
@@ -1388,7 +1388,16 @@ export default function RegisterPage() {
                   {submitting
                     ? 'Mendaftarkan...'
                     : 'Daftar Sekarang'}
-                </button>
+                </button>*/}
+
+                <button
+                type="button"
+                disabled
+                className="btn btn-primary w-full mt-32 register-closed-button"
+              >
+                Pendaftaran UMUM Belum Dibuka
+              </button>
+
 
               </form>
 
