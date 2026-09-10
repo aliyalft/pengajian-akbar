@@ -717,6 +717,38 @@ export default function RegisterVipPage() {
                 Ukhuwah.
               </p>
 
+            {/* ======================
+                 PENCERAMAH
+           ====================== */}
+
+          <div className="event-speaker-card">
+
+            <div className="event-speaker-photo-wrap">
+              <img
+                src="/image/KHbuya-yahya.png"
+                alt="KH. Buya Yahya"
+                className="event-speaker-photo"
+              />
+            </div>
+
+            <div className="event-speaker-content">
+              <span className="event-speaker-kicker">
+                Penceramah
+              </span>
+
+              <h3>
+                KH. Buya Yahya
+              </h3>
+
+              <div className="event-speaker-line" />
+
+              <p>
+                Pengasuh Lembaga Pengembangan Da&apos;wah
+                dan Pondok Pesantren Al-Bahjah
+              </p>
+            </div>
+
+          </div>
 
               {/* COUNTDOWN */}
 
