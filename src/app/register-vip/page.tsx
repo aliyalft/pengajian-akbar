@@ -546,6 +546,27 @@ export default function RegisterVipPage() {
         />
       </div>
 
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-kf.png"
+          alt="Kimiafarma"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-tv.png"
+          alt="TvHarmnoni"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-am.png"
+          alt="Al-Masoem"
+        />
+      </div>
+
       {/* DUPLICATE — untuk infinite loop */}
 
       <div className="register-partner-logo">
@@ -601,6 +622,27 @@ export default function RegisterVipPage() {
         <img
           src="/image/logo-evermos.png"
           alt="Evermos"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-kf.png"
+          alt="Kimiafarma"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-tv.png"
+          alt="TvHarmnoni"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-am.png"
+          alt="Al-Masoem"
         />
       </div>
 
