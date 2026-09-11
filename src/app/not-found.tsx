@@ -99,88 +99,45 @@ export default function NotFound() {
               Pengajian Akbar MT MHABD
             </h2>
 
-            <p>
-              Halaman yang Anda cari tidak tersedia.
-            </p>
+            
 
           </div>
 
 
 
-          <section className="staff-login-card">
+<section className="staff-login-card notfound-card">
 
+  <div className="notfound-poster">
+    <img
+      src="/image/poster.png"
+      alt="Poster Pengajian Akbar MT MHABD"
+    />
+  </div>
 
-            <div className="staff-login-icon">
+  <div className="staff-login-heading notfound-heading">
 
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
+    <h1>
+      Hadiri Pengajian Akbar
+    </h1>
 
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="9"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                />
+    <p>
+      Temukan informasi lengkap dan lakukan pendaftaran melalui halaman utama Pengajian Akbar.
+    </p>
 
-                <path
-                  d="M12 8v5"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
+  </div>
 
-                <circle
-                  cx="12"
-                  cy="16.5"
-                  r="1"
-                  fill="currentColor"
-                />
+  <div className="notfound-actions">
 
-              </svg>
+    <Link
+      href="/register"
+      className="notfound-primary"
+    >
+      Daftar Pengajian Sekarang
+    </Link>
 
-            </div>
+  </div>
 
-
-
-            <div className="staff-login-heading">
-
-              <h1>
-                404
-              </h1>
-
-
-              <p>
-                Maaf, halaman yang Anda buka
-                tidak ditemukan. Silakan kembali
-                atau lakukan registrasi Pengajian Akbar.
-              </p>
-
-            </div>
-
-
-
-            <div className="notfound-actions">
-
-
-              <Link
-                href="/register"
-                className="notfound-primary"
-              >
-                Daftar Pengajian Sekarang
-              </Link>
-
-
-
-              
-
-            </div>
-
-
-          </section>
+</section>
 
 
         </div>

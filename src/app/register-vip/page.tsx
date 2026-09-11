@@ -492,7 +492,7 @@ export default function RegisterVipPage() {
 
       <div className="register-partner-logo">
         <img
-          src="/image/logo_biofarma.png"
+          src="/image/logo-bf1.png"
           alt="Bio Farma"
         />
       </div>
@@ -571,7 +571,7 @@ export default function RegisterVipPage() {
 
       <div className="register-partner-logo">
         <img
-          src="/image/logo_biofarma.png"
+          src="/image/logo-bf1.png"
           alt="Bio Farma"
         />
       </div>
