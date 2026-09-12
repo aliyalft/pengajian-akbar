@@ -11181,8 +11181,6 @@ body {
   padding: 3px 0 5px;
 }
 
-  
-
 
 /* =============================================
    MOVING TRACK
@@ -11302,10 +11300,6 @@ body {
 }
 
 
-/* =============================================
-   LOGOS
-============================================= */
-
 .register-partners-card .register-partner-logo img {
   position: relative;
   z-index: 1;
@@ -11315,10 +11309,11 @@ body {
   width: auto;
   height: auto;
 
-  max-width: 125px;
-  max-height: 48px;
+  max-width: 135px;
+  max-height: 50px;
 
   object-fit: contain;
+
   filter: none;
 
   flex-shrink: 0;
@@ -11326,13 +11321,13 @@ body {
 
 
 /* =============================================
-   BIO FARMA
-   Original = child 1
-   Duplicate = child 9
+   LOGO SIZE — DESKTOP
 ============================================= */
 
-.register-partners-card .register-partner-logo:nth-child(1) img,
-.register-partners-card .register-partner-logo:nth-child(9) img {
+
+/* Bio Farma */
+
+.register-partners-card .register-partner-logo img[alt="Bio Farma"] {
   width: 155px !important;
   height: 52px !important;
 
@@ -11340,23 +11335,75 @@ body {
   max-height: 52px !important;
 
   object-fit: contain !important;
-  flex-shrink: 0 !important;
 }
 
 
-/* =============================================
-   J&C COOKIES
-   Original = child 2
-   Duplicate = child 10
-============================================= */
+/* JC */
 
-.register-partners-card .register-partner-logo:nth-child(2) img,
-.register-partners-card .register-partner-logo:nth-child(10) img {
+.register-partners-card .register-partner-logo img[alt="JC"] {
   width: 82px !important;
   height: 58px !important;
 
   max-width: 82px !important;
   max-height: 58px !important;
+
+  object-fit: contain !important;
+}
+
+
+/* Corak Warna */
+
+.register-partners-card .register-partner-logo img[alt="Corak Warna"] {
+  width: 125px !important;
+  height: 52px !important;
+
+  max-width: 145px !important;
+  max-height: 52px !important;
+
+  object-fit: contain !important;
+}
+
+
+/* Evermos */
+
+.register-partners-card .register-partner-logo img[alt="Evermos"] {
+  width: 120px !important;
+  height: 60px !important;
+
+  max-width: 120px !important;
+  max-height: 60px !important;
+
+  object-fit: contain !important;
+}
+
+
+/* =============================================
+   KIMIA FARMA
+   KHUSUS — DIBUAT LEBIH BESAR
+============================================= */
+
+.register-partners-card .register-partner-logo img[alt="Kimiafarma"],
+.register-partners-card .register-partner-logo img[alt="Kimia Farma"] {
+  width: 145px !important;
+  height: 52px !important;
+
+  max-width: 145px !important;
+  max-height: 52px !important;
+
+  object-fit: contain !important;
+}
+
+/* =============================================
+   KOLABORASI
+   KHUSUS
+============================================= */
+
+.register-partners-card .register-partner-logo img[alt="Kolaborasi"] {
+  width: 170px !important;
+  height: 80px !important;
+
+  max-width: 170px !important;
+  max-height: 80px !important;
 
   object-fit: contain !important;
 }
@@ -11435,6 +11482,7 @@ body {
 
   .register-partners-card .register-partners-track {
     gap: 8px;
+
     animation-duration: 18s !important;
   }
 
@@ -11449,6 +11497,7 @@ body {
     height: 63px;
 
     padding: 7px 7px;
+
     border-radius: 12px;
   }
 
@@ -11459,48 +11508,96 @@ body {
   }
 
 
-  /* Bio Farma
-     Original = 1
-     Duplicate = 9
-  */
+  /* =========================================
+     BIO FARMA — MOBILE
+  ========================================= */
 
-  .register-partners-card .register-partner-logo:nth-child(1) img,
-.register-partners-card .register-partner-logo:nth-child(12) img {
-  width: 155px !important;
-  height: 52px !important;
+  .register-partners-card .register-partner-logo img[alt="Bio Farma"] {
+    width: 155px !important;
+    height: 52px !important;
 
-  max-width: 155px !important;
-  max-height: 52px !important;
+    max-width: 155px !important;
+    max-height: 52px !important;
 
-  object-fit: contain !important;
-  flex-shrink: 0 !important;
-}
+    object-fit: contain !important;
+  }
 
 
-  /* J&C Cookies
-     Original = 2
-     Duplicate = 10
-  */
+  /* =========================================
+     JC — MOBILE
+  ========================================= */
 
-  .register-partners-card .register-partner-logo:nth-child(2) img,
-  .register-partners-card .register-partner-logo:nth-child(10) img {
+  .register-partners-card .register-partner-logo img[alt="JC"] {
     width: 69px !important;
     height: 47px !important;
 
     max-width: 69px !important;
     max-height: 47px !important;
+
+    object-fit: contain !important;
+  }
+
+
+  /* =========================================
+     CORAK WARNA — MOBILE
+  ========================================= */
+
+  .register-partners-card .register-partner-logo img[alt="Corak Warna"] {
+    width: 125px !important;
+    height: 52px !important;
+
+    max-width: 145px !important;
+    max-height: 52px !important;
+
+    object-fit: contain !important;
+  }
+
+
+  /* =========================================
+     EVERMOS — MOBILE
+  ========================================= */
+
+  .register-partners-card .register-partner-logo img[alt="Evermos"] {
+    width: 90px !important;
+    height: 42px !important;
+
+    max-width: 90px !important;
+    max-height: 42px !important;
+
+    object-fit: contain !important;
+  }
+
+
+  /* =========================================
+     KIMIA FARMA — MOBILE
+     LEBIH BESAR
+  ========================================= */
+
+  .register-partners-card .register-partner-logo img[alt="Kimiafarma"],
+  .register-partners-card .register-partner-logo img[alt="Kimia Farma"] {
+    width: 125px !important;
+    height: 46px !important;
+
+    max-width: 125px !important;
+    max-height: 46px !important;
+
+    object-fit: contain !important;
   }
 
 }
 
-/* CORAK WARNA — LEBIH BESAR */
-.register-partners-card .register-partner-logo img[alt="Corak Warna"] {
-  width: 125px !important;
-  height: 52px !important;
-  max-width: 145px !important;
-  max-height: 52px !important;
+/* KOLABORASI — MOBILE */
+
+.register-partners-card .register-partner-logo img[alt="Kolaborasi"] {
+  width: 120px !important;
+  height: 50px !important;
+
+  max-width: 120px !important;
+  max-height: 50px !important;
+
   object-fit: contain !important;
 }
+
 
 /* =============================================
    SMALL PHONE
@@ -11536,6 +11633,7 @@ body {
 
   .register-partners-card .register-partners-track {
     gap: 6px;
+
     animation-duration: 15s !important;
   }
 
@@ -11550,6 +11648,7 @@ body {
     height: 56px;
 
     padding: 6px 4px;
+
     border-radius: 10px;
   }
 
@@ -11560,10 +11659,11 @@ body {
   }
 
 
-  /* Bio Farma */
+  /* =========================================
+     BIO FARMA — SMALL PHONE
+  ========================================= */
 
-  .register-partners-card .register-partner-logo:nth-child(1) img,
-.register-partners-card .register-partner-logo:nth-child(12) img {
+  .register-partners-card .register-partner-logo img[alt="Bio Farma"] {
     width: 140px !important;
     height: 48px !important;
 
@@ -11574,19 +11674,80 @@ body {
   }
 
 
-  /* J&C Cookies */
+  /* =========================================
+     JC — SMALL PHONE
+  ========================================= */
 
-  .register-partners-card .register-partner-logo:nth-child(2) img,
-  .register-partners-card .register-partner-logo:nth-child(10) img {
+  .register-partners-card .register-partner-logo img[alt="JC"] {
     width: 61px !important;
     height: 42px !important;
 
     max-width: 61px !important;
     max-height: 42px !important;
+
+    object-fit: contain !important;
+  }
+
+
+  /* =========================================
+     CORAK WARNA — SMALL PHONE
+  ========================================= */
+
+  .register-partners-card .register-partner-logo img[alt="Corak Warna"] {
+    width: 115px !important;
+    height: 48px !important;
+
+    max-width: 125px !important;
+    max-height: 48px !important;
+
+    object-fit: contain !important;
+  }
+
+
+  /* =========================================
+     EVERMOS — SMALL PHONE
+  ========================================= */
+
+  .register-partners-card .register-partner-logo img[alt="Evermos"] {
+    width: 80px !important;
+    height: 38px !important;
+
+    max-width: 80px !important;
+    max-height: 38px !important;
+
+    object-fit: contain !important;
+  }
+
+
+  /* =========================================
+     KIMIA FARMA — SMALL PHONE
+     LEBIH BESAR
+  ========================================= */
+
+  .register-partners-card .register-partner-logo img[alt="Kimiafarma"],
+  .register-partners-card .register-partner-logo img[alt="Kimia Farma"] {
+    width: 115px !important;
+    height: 43px !important;
+
+    max-width: 115px !important;
+    max-height: 43px !important;
+
+    object-fit: contain !important;
   }
 
 }
 
+/* KOLABORASI — SMALL PHONE */
+
+.register-partners-card .register-partner-logo img[alt="Kolaborasi"] {
+  width: 120px !important;
+  height: 50px !important;
+
+  max-width: 120px !important;
+  max-height: 50px !important;
+
+  object-fit: contain !important;
+}
 
 /* =============================================
    VERY SMALL PHONE
@@ -11620,6 +11781,7 @@ body {
 
   .register-partners-card .register-partners-track {
     gap: 6px;
+
     animation-duration: 13s !important;
   }
 
@@ -11634,6 +11796,7 @@ body {
     height: 52px;
 
     padding: 5px 3px;
+
     border-radius: 9px;
   }
 
@@ -11644,10 +11807,11 @@ body {
   }
 
 
-  /* Bio Farma */
+  /* =========================================
+     BIO FARMA — VERY SMALL PHONE
+  ========================================= */
 
-  .register-partners-card .register-partner-logo:nth-child(1) img,
-  .register-partners-card .register-partner-logo:nth-child(9) img {
+  .register-partners-card .register-partner-logo img[alt="Bio Farma"] {
     width: 120px !important;
     height: 44px !important;
 
@@ -11658,17 +11822,79 @@ body {
   }
 
 
-  /* J&C Cookies */
+  /* =========================================
+     JC — VERY SMALL PHONE
+  ========================================= */
 
-  .register-partners-card .register-partner-logo:nth-child(2) img,
-  .register-partners-card .register-partner-logo:nth-child(10) img {
+  .register-partners-card .register-partner-logo img[alt="JC"] {
     width: 55px !important;
     height: 39px !important;
 
     max-width: 55px !important;
     max-height: 39px !important;
+
+    object-fit: contain !important;
   }
 
+
+  /* =========================================
+     CORAK WARNA — VERY SMALL PHONE
+  ========================================= */
+
+  .register-partners-card .register-partner-logo img[alt="Corak Warna"] {
+    width: 105px !important;
+    height: 44px !important;
+
+    max-width: 110px !important;
+    max-height: 44px !important;
+
+    object-fit: contain !important;
+  }
+
+
+  /* =========================================
+     EVERMOS — VERY SMALL PHONE
+  ========================================= */
+
+  .register-partners-card .register-partner-logo img[alt="Evermos"] {
+    width: 72px !important;
+    height: 34px !important;
+
+    max-width: 72px !important;
+    max-height: 34px !important;
+
+    object-fit: contain !important;
+  }
+
+
+  /* =========================================
+     KIMIA FARMA — VERY SMALL PHONE
+     LEBIH BESAR
+  ========================================= */
+
+  .register-partners-card .register-partner-logo img[alt="Kimiafarma"],
+  .register-partners-card .register-partner-logo img[alt="Kimia Farma"] {
+    width: 105px !important;
+    height: 40px !important;
+
+    max-width: 105px !important;
+    max-height: 40px !important;
+
+    object-fit: contain !important;
+  }
+
+}
+
+/* KOLABORASI — VERY SMALL PHONE */
+
+.register-partners-card .register-partner-logo img[alt="Kolaborasi"] {
+  width: 100px !important;
+  height: 40px !important;
+
+  max-width: 100px !important;
+  max-height: 40px !important;
+
+  object-fit: contain !important;
 }
 
 
@@ -11698,46 +11924,6 @@ body {
 
   color: #086b4f;
 }
-
-/* =============================================
-   EVERMOS — SMALLER LOGO
-============================================= */
-
-.register-partners-card .register-partner-logo img[alt="Evermos"] {
-  width: 120px !important;
-  height: 60px !important;
-  max-width: 120px !important;
-  max-height: 60px !important;
-
-  object-fit: contain !important;
-}
-
-
-/* MOBILE */
-
-@media (max-width: 760px) {
-  .register-partners-card .register-partner-logo img[alt="Evermos"] {
-    width: 90px !important;
-    height: 42px !important;
-
-    max-width: 90px !important;
-    max-height: 42px !important;
-  }
-}
-
-
-/* SMALL PHONE */
-
-@media (max-width: 430px) {
-  .register-partners-card .register-partner-logo img[alt="Evermos"] {
-    width: 80px !important;
-    height: 38px !important;
-
-    max-width: 80px !important;
-    max-height: 38px !important;
-  }
-}
-
 /* =============================================
    PENCERAMAH
 ============================================= */
