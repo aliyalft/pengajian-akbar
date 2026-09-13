@@ -310,24 +310,48 @@ export default function RegisterPage() {
 
             <div className="register-v2-heading-inner">
 
-              <div className="register-organizer-logos">
-            <img
-                src="/image/logo-p1.png"
-                alt="Logo Penyelenggara 1"
-                className="register-organizer-logo"
-            />
+             <div className="register-organizer-logos">
+  <img
+    src="/image/logo-p1.png"
+    alt="Logo Penyelenggara 1"
+    className="register-organizer-logo"
+  />
 
-            <img
-                src="/image/logo-p2.png"
-                alt="Logo Penyelenggara 2"
-                className="register-organizer-logo"
-            />
-            </div>
+  <img
+    src="/image/logo-p2.png"
+    alt="Logo Penyelenggara 2"
+    className="register-organizer-logo"
+  />
 
-              <h1
-                className="register-v2-heading manual-spacing"
-                aria-label="Pengajian Akbar"
-              >
+  <img
+    src="/image/logo-p3.png"
+    alt="Logo Penyelenggara 3"
+    className="register-organizer-logo"
+  />
+
+  <img
+    src="/image/logo-p4.png"
+    alt="Logo Penyelenggara 4"
+    className="register-organizer-logo"
+  />
+
+  <img
+    src="/image/logo-p5(1).png"
+    alt="Logo Penyelenggara 5"
+    className="register-organizer-logo"
+  />
+
+  <img
+    src="/image/logo-p6.png"
+    alt="Logo Penyelenggara 6"
+    className="register-organizer-logo"
+  />
+</div>
+
+<h1
+  className="register-v2-heading manual-spacing"
+  aria-label="Pengajian Akbar"
+>
 
                 {'Pengajian Akbar'
                   .split('')
@@ -665,6 +689,39 @@ export default function RegisterPage() {
                 Ukhuwah.
               </p>
 
+              {/* ======================
+                 PENCERAMAH
+           ====================== */}
+
+          <div className="event-speaker-card">
+
+            <div className="event-speaker-photo-wrap">
+              <img
+                src="/image/KHbuya-yahya(1).png"
+                alt="KH. Buya Yahya"
+                className="event-speaker-photo"
+              />
+            </div>
+
+            <div className="event-speaker-content">
+              <span className="event-speaker-kicker">
+                Penceramah
+              </span>
+
+              <h3>
+                KH. Buya Yahya
+              </h3>
+
+              <div className="event-speaker-line" />
+
+              <p>
+                Pengasuh Lembaga Pengembangan Da&apos;wah
+                dan Pondok Pesantren Al-Bahjah
+              </p>
+            </div>
+
+          </div>
+
             {/* ======================
     TALKSHOW
 ====================== */}
@@ -744,38 +801,7 @@ export default function RegisterPage() {
 
 </div>
 
-           {/* ======================
-                 PENCERAMAH
-           ====================== */}
-
-          <div className="event-speaker-card">
-
-            <div className="event-speaker-photo-wrap">
-              <img
-                src="/image/KHbuya-yahya.png"
-                alt="KH. Buya Yahya"
-                className="event-speaker-photo"
-              />
-            </div>
-
-            <div className="event-speaker-content">
-              <span className="event-speaker-kicker">
-                Penceramah
-              </span>
-
-              <h3>
-                KH. Buya Yahya
-              </h3>
-
-              <div className="event-speaker-line" />
-
-              <p>
-                Pengasuh Lembaga Pengembangan Da&apos;wah
-                dan Pondok Pesantren Al-Bahjah
-              </p>
-            </div>
-
-          </div>
+           
 
               {/* COUNTDOWN */}
 
@@ -962,7 +988,7 @@ export default function RegisterPage() {
                     </div>
 
                     <strong>
-                      13.00 – 17.45 WIB
+                      13.00 – 17.30 WIB
                     </strong>
 
                     <span>
@@ -1059,7 +1085,6 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="event-benefit-copy">
-                    <span>Free Entry</span>
                     <strong>Gratis</strong>
                     <p>Tidak dipungut biaya pendaftaran</p>
                   </div>
@@ -1092,7 +1117,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="event-benefit-copy">
-                    <span>Limited Seats</span>
+                    
                     <strong>Kuota Terbatas</strong>
                     <p>Registrasi sesuai ketersediaan tempat</p>
                   </div>

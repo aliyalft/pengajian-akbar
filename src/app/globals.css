@@ -12182,10 +12182,14 @@ body {
   position: relative;
   z-index: 4;
 
+  width: 100%;
+  max-width: none;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
+  flex-wrap: nowrap;
   gap: 14px;
 
   margin-bottom: 13px;
@@ -12193,10 +12197,10 @@ body {
 
 .register-organizer-logo {
   display: block;
+  flex: 0 0 auto;
 
   width: auto;
   height: 54px;
-
   max-width: 105px;
 
   object-fit: contain;
@@ -12206,7 +12210,9 @@ body {
 /* MOBILE */
 
 @media (max-width: 760px) {
+
   .register-organizer-logos {
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 10px;
   }
@@ -12215,12 +12221,14 @@ body {
     height: 44px;
     max-width: 82px;
   }
+
 }
 
 
 /* SMALL PHONE */
 
 @media (max-width: 430px) {
+
   .register-organizer-logos {
     gap: 8px;
     margin-bottom: 9px;
@@ -12230,7 +12238,194 @@ body {
     height: 39px;
     max-width: 72px;
   }
+
 }
+
+/* =============================================
+   FORCE ORGANIZER LOGOS POSITION
+============================================= */
+
+.register-organizer-logos {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex-wrap: nowrap !important;
+  gap: 14px !important;
+
+  margin: 0 auto 13px !important;
+  padding: 0 !important;
+
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+
+  transform: none !important;
+}
+
+.register-organizer-logo {
+  position: static !important;
+
+  display: block !important;
+  flex: 0 0 auto !important;
+
+  width: auto !important;
+  height: 54px !important;
+  max-width: 105px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+
+  transform: none !important;
+}
+
+.register-organizer-logo:nth-child(5),
+.register-organizer-logo:nth-child(6) {
+  transform: translateY(-12px) !important;
+}
+
+@media (max-width: 760px) {
+
+  .register-organizer-logos {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+
+    width: 100% !important;
+    gap: 3px !important;
+
+    margin: 0 auto 10px !important;
+    padding: 0 !important;
+  }
+
+  .register-organizer-logo {
+    position: static !important;
+
+    flex: 0 0 auto !important;
+
+    width: 58px !important;
+    height: 40px !important;
+
+    max-width: 58px !important;
+    max-height: 40px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: block !important;
+
+    object-fit: contain !important;
+    object-position: center !important;
+
+    transform: none !important;
+  }
+
+  /* Logo 1 — bulat */
+  .register-organizer-logo:nth-child(1) {
+    width: 52px !important;
+    max-width: 52px !important;
+  }
+
+  /* Logo 2 — Dakwah Al-Bahjah */
+  .register-organizer-logo:nth-child(2) {
+    position: relative !important;
+    left: -10px !important;
+    transform: none !important;
+  }
+
+  /* Logo 3 — Media */
+  .register-organizer-logo:nth-child(3) {
+    position: relative !important;
+    left: -17px !important;
+    transform: none !important;
+  }
+
+  /* Logo 4 — Al-Bahjah Peduli */
+  .register-organizer-logo:nth-child(4) {
+    position: relative !important;
+    left: -4px !important;
+    transform: none !important;
+  }
+  /* Logo 5 — Wakaf Al-Bahjah */
+  .register-organizer-logo:nth-child(5) {
+    width: 62px !important;
+    max-width: 62px !important;
+    transform: translateY(-16px) !important;
+  }
+
+  /* Logo 6 — PUSDAI */
+  .register-organizer-logo:nth-child(6) {
+    width: 48px !important;
+    max-width: 48px !important;
+    transform: translateY(-16px) !important;
+  }
+}
+
+@media (max-width: 430px) {
+
+  .register-organizer-logos {
+    gap: 1px !important;
+    margin-bottom: 9px !important;
+  }
+
+  .register-organizer-logo {
+    height: 35px !important;
+    max-height: 35px !important;
+  }
+
+  .register-organizer-logo:nth-child(1) {
+    width: 47px !important;
+    max-width: 47px !important;
+  }
+
+  .register-organizer-logo:nth-child(2) {
+    width: 48px !important;
+    max-width: 48px !important;
+    transform: translateX(3px) !important;
+  }
+
+  .register-organizer-logo:nth-child(3) {
+    width: 45px !important;
+    max-width: 45px !important;
+    transform: translateX(4px) !important;
+  }
+
+  .register-organizer-logo:nth-child(4) {
+    width: 56px !important;
+    max-width: 56px !important;
+    transform: translateX(-6px) !important;
+  }
+
+  .register-organizer-logo:nth-child(5) {
+    width: 55px !important;
+    max-width: 55px !important;
+    transform: translateY(-8px) !important;
+  }
+
+  .register-organizer-logo:nth-child(6) {
+    width: 43px !important;
+    max-width: 43px !important;
+    transform: translateY(-8px) !important;
+  }
+}
+
+
+
+
+
+
 
 /* =============================================
    HIJRI DATE
