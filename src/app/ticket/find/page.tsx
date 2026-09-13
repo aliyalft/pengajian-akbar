@@ -6,9 +6,12 @@ import { useRouter } from 'next/navigation';
 export default function FindTicketPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
-  const [searching, setSearching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [searchMethod, setSearchMethod] = useState<'email' | 'phone'>(
+  'email'
+);
+const [searchValue, setSearchValue] = useState('');
+const [searching, setSearching] = useState(false);
+const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (
     event: FormEvent<HTMLFormElement>
@@ -29,8 +32,9 @@ export default function FindTicketPage() {
         },
 
         body: JSON.stringify({
-          email,
-        }),
+  method: searchMethod,
+  value: searchValue,
+}),
       });
 
       const data = await response.json();
@@ -148,10 +152,11 @@ export default function FindTicketPage() {
           </h1>
 
           <p>
-            Masukkan alamat email yang Anda gunakan
-            saat registrasi. Kami akan membuka kembali
-            e-ticket Anda secara otomatis.
-          </p>
+           
+          Temukan kembali e-ticket Anda menggunakan email
+          atau nomor telepon saat pendaftaran.
+        </p>
+         
 
         </section>
 
@@ -193,8 +198,8 @@ export default function FindTicketPage() {
             </h2>
 
             <p className="find-ticket-card-copy">
-              Gunakan email yang sama dengan email
-              yang Anda isi saat melakukan pendaftaran.
+              Gunakan email atau nomor telepon yang Anda
+  gunakan saat melakukan pendaftaran.
             </p>
 
 
@@ -205,51 +210,116 @@ export default function FindTicketPage() {
 
               <div className="find-ticket-form-group">
 
-                <label htmlFor="email">
-                  Email
-                  <span>*</span>
-                </label>
+  <label>
+    Cari menggunakan
+  </label>
 
-                <div className="find-ticket-input-wrap">
+  <div className="find-ticket-methods">
+    <button
+      type="button"
+      className={
+        searchMethod === 'email'
+          ? 'find-ticket-method active'
+          : 'find-ticket-method'
+      }
+      onClick={() => {
+        setSearchMethod('email');
+        setSearchValue('');
+        setError(null);
+      }}
+    >
+      Email
+    </button>
 
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <rect
-                      x="3"
-                      y="5"
-                      width="18"
-                      height="14"
-                      rx="3"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                    />
+    <button
+      type="button"
+      className={
+        searchMethod === 'phone'
+          ? 'find-ticket-method active'
+          : 'find-ticket-method'
+      }
+      onClick={() => {
+        setSearchMethod('phone');
+        setSearchValue('');
+        setError(null);
+      }}
+    >
+      Nomor Telepon
+    </button>
+  </div>
 
-                    <path
-                      d="M4 7L10.7 12.1C11.47 12.69 12.53 12.69 13.3 12.1L20 7"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+  <label htmlFor="search-value">
+    {searchMethod === 'email'
+      ? 'Email'
+      : 'Nomor Telepon'}
+    <span>*</span>
+  </label>
 
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="nama@email.com"
-                    value={email}
-                    onChange={(event) =>
-                      setEmail(event.target.value)
-                    }
-                    required
-                  />
+  <div className="find-ticket-input-wrap">
 
-                </div>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      {searchMethod === 'email' ? (
+        <>
+          <rect
+            x="3"
+            y="5"
+            width="18"
+            height="14"
+            rx="3"
+            stroke="currentColor"
+            strokeWidth="1.7"
+          />
 
-              </div>
+          <path
+            d="M4 7L10.7 12.1C11.47 12.69 12.53 12.69 13.3 12.1L20 7"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </>
+      ) : (
+        <path
+          d="M6.6 3.5h3l1.5 4-2 1.8c1 2.1 2.7 3.8 4.8 4.8l1.8-2 4 1.5v3c0 1.1-.9 2-2 2C10.1 18.6 5.4 13.9 5.4 8.3c0-1.1.9-2 1.2-4.8Z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
+    </svg>
+
+    <input
+      id="search-value"
+      type={
+        searchMethod === 'email'
+          ? 'email'
+          : 'tel'
+      }
+      inputMode={
+        searchMethod === 'email'
+          ? 'email'
+          : 'tel'
+      }
+      placeholder={
+        searchMethod === 'email'
+          ? 'nama@email.com'
+          : '08xxxxxxxxxx'
+      }
+      value={searchValue}
+      onChange={(event) =>
+        setSearchValue(event.target.value)
+      }
+      required
+    />
+
+  </div>
+
+</div>
 
 
               {error && (
@@ -295,8 +365,8 @@ export default function FindTicketPage() {
 
 
         <p className="find-ticket-note">
-          Satu alamat email hanya terhubung dengan
-          satu tiket pendaftaran.
+           Gunakan email atau nomor telepon yang terdaftar
+  saat melakukan pendaftaran.
         </p>
 
       </div>

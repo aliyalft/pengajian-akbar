@@ -5,14 +5,23 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const email = String(body.email || '')
+    const method = String(body.method || '')
       .trim()
       .toLowerCase();
 
-    if (!email) {
+      if (method !== 'email' && method !== 'phone') {
+    return NextResponse.json(
+    { error: 'Metode pencarian tidak valid.' },
+    { status: 400 }
+  );
+}
+
+    const value = String(body.value || '').trim();
+
+    if (!method || !value) {
       return NextResponse.json(
         {
-          error: 'Email wajib diisi.',
+          error: 'Email atau nomor telepon wajib diisi.',
         },
         {
           status: 400,
@@ -21,21 +30,73 @@ export async function POST(req: Request) {
     }
 
     // =========================
+    // NORMALISASI PENCARIAN
+    // =========================
+
+    const searchValue =
+  method === 'email'
+    ? value.toLowerCase()
+    : (() => {
+        let phone = value.replace(/\D/g, '');
+
+        if (phone.startsWith('62')) {
+          phone = '0' + phone.slice(2);
+        } else if (phone.startsWith('8')) {
+          phone = '0' + phone;
+        }
+
+        return phone;
+      })();
+
+if (!searchValue) {
+  return NextResponse.json(
+    {
+      error:
+        method === 'phone'
+          ? 'Nomor telepon tidak valid.'
+          : 'Email tidak valid.',
+    },
+    {
+      status: 400,
+    }
+  );
+}
+
+    // =========================
     // CEK TIKET UMUM
     // =========================
-    const { data: generalTicket, error: generalError } =
-      await supabaseAdmin
-        .from('registrations')
-        .select('id, email')
-        .ilike('email', email)
-        .maybeSingle();
+
+    let generalQuery = supabaseAdmin
+      .from('registrations')
+      .select('id, email, phone_number');
+
+    if (method === 'email') {
+      generalQuery = generalQuery.ilike(
+        'email',
+        searchValue
+      );
+    } else {
+      generalQuery = generalQuery.eq(
+        'phone_number',
+        searchValue
+      );
+    }
+
+    const {
+      data: generalTicket,
+      error: generalError,
+    } = await generalQuery.maybeSingle();
 
     if (generalError) {
-      console.error('Find general ticket error:', generalError);
+      console.error(
+        'Find general ticket error:',
+        generalError
+      );
 
       return NextResponse.json(
         {
-          error: 'Tiket tidak dapat ditemukan. Silakan coba lagi.',
+          error:
+            'Tiket tidak dapat ditemukan. Silakan coba lagi.',
         },
         {
           status: 500,
@@ -53,19 +114,38 @@ export async function POST(req: Request) {
     // =========================
     // CEK TIKET VIP
     // =========================
-    const { data: vipTicket, error: vipError } =
-      await supabaseAdmin
-        .from('registrations_vip')
-        .select('id, email')
-        .ilike('email', email)
-        .maybeSingle();
+
+    let vipQuery = supabaseAdmin
+      .from('registrations_vip')
+      .select('id, email, phone_number');
+
+    if (method === 'email') {
+      vipQuery = vipQuery.ilike(
+        'email',
+        searchValue
+      );
+    } else {
+      vipQuery = vipQuery.eq(
+        'phone_number',
+        searchValue
+      );
+    }
+
+    const {
+      data: vipTicket,
+      error: vipError,
+    } = await vipQuery.maybeSingle();
 
     if (vipError) {
-      console.error('Find VIP ticket error:', vipError);
+      console.error(
+        'Find VIP ticket error:',
+        vipError
+      );
 
       return NextResponse.json(
         {
-          error: 'Tiket tidak dapat ditemukan. Silakan coba lagi.',
+          error:
+            'Tiket tidak dapat ditemukan. Silakan coba lagi.',
         },
         {
           status: 500,
@@ -83,20 +163,28 @@ export async function POST(req: Request) {
     // =========================
     // TIDAK DITEMUKAN
     // =========================
+
     return NextResponse.json(
       {
-        error: 'Tidak ditemukan registrasi dengan email tersebut.',
+        error:
+          method === 'phone'
+            ? 'Tidak ditemukan registrasi dengan nomor telepon tersebut.'
+            : 'Tidak ditemukan registrasi dengan email tersebut.',
       },
       {
         status: 404,
       }
     );
   } catch (error) {
-    console.error('Find ticket route error:', error);
+    console.error(
+      'Find ticket route error:',
+      error
+    );
 
     return NextResponse.json(
       {
-        error: 'Tiket tidak dapat ditemukan. Silakan coba lagi.',
+        error:
+          'Tiket tidak dapat ditemukan. Silakan coba lagi.',
       },
       {
         status: 500,

@@ -12173,3 +12173,634 @@ body {
 .notfound-actions {
   margin-top: 24px;
 }
+
+/* =============================================
+   ORGANIZER LOGOS
+============================================= */
+
+.register-organizer-logos {
+  position: relative;
+  z-index: 4;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  margin-bottom: 13px;
+}
+
+.register-organizer-logo {
+  display: block;
+
+  width: auto;
+  height: 54px;
+
+  max-width: 105px;
+
+  object-fit: contain;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+  .register-organizer-logos {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .register-organizer-logo {
+    height: 44px;
+    max-width: 82px;
+  }
+}
+
+
+/* SMALL PHONE */
+
+@media (max-width: 430px) {
+  .register-organizer-logos {
+    gap: 8px;
+    margin-bottom: 9px;
+  }
+
+  .register-organizer-logo {
+    height: 39px;
+    max-width: 72px;
+  }
+}
+
+/* =============================================
+   HIJRI DATE
+============================================= */
+
+.event-detail-hijri {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-family: var(--font-heading), serif;
+
+  font-size: 0.92rem;
+
+  line-height: 1.15;
+
+  font-weight: 600;
+
+  color: #c9a44c;
+}
+
+@media (max-width: 430px) {
+  .event-detail-hijri {
+    font-size: 0.82rem;
+  }
+}
+
+/* =============================================
+   TALKSHOW
+   MATCH PENCERAMAH CARD
+============================================= */
+
+.event-talkshow-card {
+  position: relative;
+
+  width: 100%;
+
+  margin-top: 26px;
+
+  padding: 16px;
+
+  border: 1px solid rgba(17, 113, 80, 0.12);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fffdf4 0%,
+      #f3f8ef 100%
+    );
+
+  box-shadow:
+    0 14px 30px rgba(0, 78, 56, 0.12);
+
+  overflow: hidden;
+}
+
+.event-talkshow-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 150px;
+  height: 150px;
+
+  right: -75px;
+  bottom: -80px;
+
+  border-radius: 50%;
+
+  border: 1px solid rgba(17, 113, 80, 0.10);
+
+  pointer-events: none;
+}
+
+
+/* =============================================
+   TALKSHOW HEADING
+============================================= */
+
+.event-talkshow-heading {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 8px;
+
+  padding-bottom: 10px;
+
+  border-bottom: 1px solid rgba(17, 113, 80, 0.10);
+}
+
+.event-talkshow-heading span {
+  font-family: var(--font-heading), serif;
+
+  font-size: 1.45rem;
+
+  line-height: 1;
+
+  font-weight: 600;
+
+  color: #086b4f;
+}
+
+.event-talkshow-heading strong {
+  font-family:
+    "Noto Sans",
+    Arial,
+    sans-serif;
+
+  font-size: 0.60rem;
+
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+
+  color: #8b9b92;
+}
+
+
+/* =============================================
+   TALKSHOW LIST
+============================================= */
+
+.event-talkshow-list {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+.event-talkshow-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  padding: 10px 0;
+}
+
+.event-talkshow-number {
+  flex: 0 0 auto;
+
+  font-family: var(--font-heading), serif;
+
+  font-size: 0.75rem;
+
+  line-height: 1.3;
+
+  font-weight: 600;
+
+  color: #c89f3d;
+}
+
+.event-talkshow-item strong {
+  display: block;
+
+  font-family:
+    "Noto Sans",
+    Arial,
+    sans-serif;
+
+  font-size: 0.82rem;
+
+  line-height: 1.3;
+
+  font-weight: 700;
+
+  color: #25483c;
+}
+
+.event-talkshow-item p {
+  margin: 2px 0 0;
+
+  font-family:
+    "Noto Sans",
+    Arial,
+    sans-serif;
+
+  font-size: 0.66rem;
+
+  line-height: 1.4;
+
+  color: #71897f;
+}
+
+.event-talkshow-divider {
+  width: calc(100% - 27px);
+
+  height: 1px;
+
+  margin-left: 27px;
+
+  background: rgba(17, 113, 80, 0.09);
+}
+
+
+/* =============================================
+   MOBILE
+============================================= */
+
+@media (max-width: 760px) {
+
+  .event-talkshow-card {
+    margin-top: 22px;
+
+    padding: 13px;
+
+    border-radius: 20px;
+  }
+
+  .event-talkshow-heading {
+    gap: 7px;
+
+    padding-bottom: 9px;
+  }
+
+  .event-talkshow-heading span {
+    font-size: 1.30rem;
+  }
+
+  .event-talkshow-heading strong {
+    font-size: 0.56rem;
+  }
+
+  .event-talkshow-item {
+    gap: 11px;
+
+    padding: 9px 0;
+  }
+
+  .event-talkshow-item strong {
+    font-size: 0.76rem;
+  }
+
+  .event-talkshow-item p {
+    font-size: 0.63rem;
+
+    line-height: 1.5;
+  }
+}
+
+
+/* =============================================
+   SMALL PHONE
+============================================= */
+
+@media (max-width: 430px) {
+
+  .event-talkshow-card {
+    margin-top: 20px;
+
+    padding: 11px;
+
+    border-radius: 18px;
+  }
+
+  .event-talkshow-heading {
+    gap: 6px;
+
+    padding-bottom: 8px;
+  }
+
+  .event-talkshow-heading span {
+    font-size: 1.15rem;
+  }
+
+  .event-talkshow-heading strong {
+    font-size: 0.52rem;
+  }
+
+  .event-talkshow-item {
+    gap: 10px;
+
+    padding: 8px 0;
+  }
+
+  .event-talkshow-item strong {
+    font-size: 0.72rem;
+  }
+
+  .event-talkshow-item p {
+    font-size: 0.60rem;
+
+    line-height: 1.5;
+  }
+
+  .event-talkshow-number {
+    font-size: 0.70rem;
+  }
+}
+
+/* =============================================
+   BAZAR UMKM
+============================================= */
+
+.event-bazar-card {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  width: 100%;
+
+  margin-top: 18px;
+
+  padding: 16px;
+
+  border: 1px solid rgba(17, 113, 80, 0.12);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fffdf4 0%,
+      #f3f8ef 100%
+    );
+
+  box-shadow:
+    0 14px 30px rgba(0, 78, 56, 0.12);
+
+  overflow: hidden;
+}
+
+.event-bazar-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 150px;
+  height: 150px;
+
+  right: -75px;
+  bottom: -80px;
+
+  border:
+    1px solid
+    rgba(17, 113, 80, 0.10);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+
+/* =============================================
+   ICON
+============================================= */
+
+.event-bazar-icon {
+  position: relative;
+
+  z-index: 2;
+
+  flex: 0 0 48px;
+
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  color: #0f7754;
+
+  background:
+    rgba(224, 241, 231, 0.72);
+
+  border:
+    1px solid
+    rgba(17, 113, 80, 0.12);
+}
+
+.event-bazar-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+
+/* =============================================
+   CONTENT
+============================================= */
+
+.event-bazar-copy {
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.event-bazar-kicker {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-family:
+    "Noto Sans",
+    Arial,
+    sans-serif;
+
+  font-size: 0.58rem;
+
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+
+  color: #2b9672;
+}
+
+.event-bazar-copy strong {
+  display: block;
+
+  font-family:
+    var(--font-heading),
+    serif;
+
+  font-size: 1.45rem;
+
+  line-height: 1;
+
+  font-weight: 600;
+
+  color: #086b4f;
+}
+
+.event-bazar-copy p {
+  margin: 4px 0 0;
+
+  font-family:
+    "Noto Sans",
+    Arial,
+    sans-serif;
+
+  font-size: 0.72rem;
+
+  line-height: 1.35;
+
+  color: #71897f;
+}
+
+
+/* =============================================
+   MOBILE
+============================================= */
+
+@media (max-width: 760px) {
+
+  .event-bazar-card {
+    gap: 12px;
+
+    margin-top: 16px;
+
+    padding: 14px;
+
+    border-radius: 20px;
+  }
+
+  .event-bazar-icon {
+    flex-basis: 42px;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
+  }
+
+  .event-bazar-icon svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .event-bazar-copy strong {
+    font-size: 1.30rem;
+  }
+
+}
+
+
+/* =============================================
+   SMALL PHONE
+============================================= */
+
+@media (max-width: 430px) {
+
+  .event-bazar-card {
+    gap: 10px;
+
+    margin-top: 14px;
+
+    padding: 12px;
+
+    border-radius: 18px;
+  }
+
+  .event-bazar-icon {
+    flex-basis: 38px;
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 11px;
+  }
+
+  .event-bazar-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .event-bazar-kicker {
+    font-size: 0.52rem;
+  }
+
+  .event-bazar-copy strong {
+    font-size: 1.15rem;
+  }
+
+  .event-bazar-copy p {
+    font-size: 0.64rem;
+  }
+
+}
+
+.find-ticket-methods {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.find-ticket-method {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: transparent;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.find-ticket-method.active {
+  border-color: #c79b45;
+  background: rgba(199, 155, 69, 0.1);
+  color: #9a722d;
+  font-weight: 600;
+}

@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
+
 import { supabaseAdmin } from '@/lib/supabaseClient';
+
 import type { Gender } from '@/lib/types';
 
 const REQUIRED_FIELDS = [
   'fullName',
   'phoneNumber',
-  'email',
   'gender',
   'city',
-  // REVISI: field baru wajib diisi
+
+  // REVISI: field wajib
   'confirmation',
   'gate',
 ] as const;
@@ -17,7 +19,20 @@ const VALID_GENDERS: Gender[] = ['Ikhwan', 'Akhwat'];
 
 // REVISI: daftar nilai valid untuk field baru
 const VALID_CONFIRMATIONS = ['YA', 'TIDAK'] as const;
+
 const VALID_GATES = ['Surapati', 'Diponegoro'] as const;
+
+const normalizePhone = (phone: string) => {
+  let value = phone.replace(/\D/g, '');
+
+  if (value.startsWith('62')) {
+    value = '0' + value.slice(2);
+  } else if (value.startsWith('8')) {
+    value = '0' + value;
+  }
+
+  return value;
+};
 
 export async function POST(request: Request) {
   try {
@@ -55,20 +70,32 @@ export async function POST(request: Request) {
       );
     }
 
-    const email = String(body.email).trim().toLowerCase();
+    // =========================
+    // EMAIL OPSIONAL
+    // =========================
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const email = String(body.email || '')
+      .trim()
+      .toLowerCase();
 
-    if (!emailPattern.test(email)) {
-      return NextResponse.json(
-        { error: 'Format email tidak valid.' },
-        { status: 400 }
-      );
+    if (email) {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailPattern.test(email)) {
+        return NextResponse.json(
+          { error: 'Format email tidak valid.' },
+          { status: 400 }
+        );
+      }
     }
 
-    const phoneNumber = String(body.phoneNumber)
-      .replace(/\D/g, '')
-      .trim();
+    // =========================
+    // NOMOR TELEPON
+    // =========================
+
+    const phoneNumber = normalizePhone(
+      String(body.phoneNumber || '')
+    );
 
     if (phoneNumber.length < 9) {
       return NextResponse.json(
@@ -77,38 +104,52 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data: existingRegistration, error: existingError } =
-      await supabaseAdmin
+    // =========================
+    // CEK EMAIL DUPLIKAT
+    // =========================
+
+    if (email) {
+      const {
+        data: existingRegistration,
+        error: existingError,
+      } = await supabaseAdmin
         .from('registrations')
         .select('id')
         .ilike('email', email)
         .maybeSingle();
 
-    if (existingError) {
-      throw existingError;
+      if (existingError) {
+        throw existingError;
+      }
+
+      if (existingRegistration) {
+        return NextResponse.json(
+          {
+            error: 'Email ini sudah terdaftar.',
+            id: existingRegistration.id,
+          },
+          { status: 409 }
+        );
+      }
     }
 
-    if (existingRegistration) {
-      return NextResponse.json(
-        {
-          error: 'Email ini sudah terdaftar.',
-          id: existingRegistration.id,
-        },
-        { status: 409 }
-      );
-    }
+    // =========================
+    // INSERT REGISTRASI
+    // =========================
 
     const { data, error } = await supabaseAdmin
       .from('registrations')
       .insert({
         full_name: String(body.fullName).trim(),
         phone_number: phoneNumber,
-        email,
+        email: email || null,
         gender: body.gender,
         city: String(body.city).trim(),
+
         institution: body.institution
           ? String(body.institution).trim()
           : null,
+
         // REVISI: kirim field baru ke database
         confirmation: body.confirmation,
         gate: body.gate,

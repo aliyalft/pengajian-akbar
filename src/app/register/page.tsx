@@ -38,7 +38,7 @@ type CityOption = {
 
 // SESUAIKAN dengan tanggal acara kamu
 const EVENT_DATE = new Date(
-  '2026-09-23T08:00:00+07:00'
+  '2026-09-30T08:00:00+07:00'
 );
 
 export default function RegisterPage() {
@@ -172,6 +172,18 @@ export default function RegisterPage() {
       clearInterval(interval);
   }, []);
 
+  const normalizePhone = (phone: string) => {
+  let value = phone.replace(/\D/g, '');
+
+  if (value.startsWith('62')) {
+    value = '0' + value.slice(2);
+  } else if (value.startsWith('8')) {
+    value = '0' + value;
+  }
+
+  return value;
+};
+
   // ⬇️ MULAIKAN KODE LAMA KAMU DI SINI
 
   /* ======================
@@ -185,6 +197,8 @@ export default function RegisterPage() {
     event.preventDefault();
 
     if (submitting) return;
+
+    const normalizedPhone = normalizePhone(phoneNumber);
 
     setSubmitting(true);
     setError(null);
@@ -204,7 +218,7 @@ export default function RegisterPage() {
             body:
               JSON.stringify({
                 fullName,
-                phoneNumber,
+                phoneNumber: normalizedPhone,
                 email,
                 gender,
                 city,
@@ -295,6 +309,20 @@ export default function RegisterPage() {
 
 
             <div className="register-v2-heading-inner">
+
+              <div className="register-organizer-logos">
+            <img
+                src="/image/logo-p1.png"
+                alt="Logo Penyelenggara 1"
+                className="register-organizer-logo"
+            />
+
+            <img
+                src="/image/logo-p2.png"
+                alt="Logo Penyelenggara 2"
+                className="register-organizer-logo"
+            />
+            </div>
 
               <h1
                 className="register-v2-heading manual-spacing"
@@ -637,6 +665,85 @@ export default function RegisterPage() {
                 Ukhuwah.
               </p>
 
+            {/* ======================
+    TALKSHOW
+====================== */}
+
+<div className="event-talkshow-card">
+
+  <div className="event-talkshow-heading">
+    <span>
+      Talkshow
+    </span>
+
+    <strong>
+      Bersama Narasumber
+    </strong>
+  </div>
+
+
+  <div className="event-talkshow-list">
+
+    <div className="event-talkshow-item">
+      <span className="event-talkshow-number">
+        01
+      </span>
+
+      <div>
+        <strong>
+          Ust Alinoer
+        </strong>
+
+        <p>
+          Direktur Wakaf Yayasan Al Bahjah
+        </p>
+      </div>
+    </div>
+
+
+    <div className="event-talkshow-divider" />
+
+
+    <div className="event-talkshow-item">
+      <span className="event-talkshow-number">
+        02
+      </span>
+
+      <div>
+        <strong>
+          dr. R. Vini Adiani Dewi, MMRS
+        </strong>
+
+        <p>
+          Kepala Dinas Kesehatan Provinsi Jawa Barat
+        </p>
+      </div>
+    </div>
+
+
+    <div className="event-talkshow-divider" />
+
+
+    <div className="event-talkshow-item">
+      <span className="event-talkshow-number">
+        03
+      </span>
+
+      <div>
+        <strong>
+          Sena Senjani, S.Ikom, M.Ikom
+        </strong>
+
+        <p>
+          Influencer
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
            {/* ======================
                  PENCERAMAH
            ====================== */}
@@ -803,8 +910,12 @@ export default function RegisterPage() {
                       Tanggal
                     </div>
 
+                    <span className="event-detail-hijri">
+                        18 Rabi&apos;ul Akhir 1448 H
+                    </span>
+
                     <strong>
-                      Rabu, 23 September 2026
+                      Rabu, 30 September 2026
                     </strong>
 
                     <span>
@@ -865,6 +976,58 @@ export default function RegisterPage() {
 
               </div>
 
+             {/* ======================
+    BAZAR UMKM
+====================== */}
+
+<div className="event-bazar-card">
+
+  <div className="event-bazar-icon">
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        d="M4 10h16l-1.2-5H5.2L4 10Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M5 10v9h14v-9M9 19v-5h6v5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M4 10c0 1.4 1 2.5 2.5 2.5S9 11.4 9 10c0 1.4 1 2.5 3 2.5s3-1.1 3-2.5c0 1.4 1 2.5 2.5 2.5S20 11.4 20 10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </div>
+
+  <div className="event-bazar-copy">
+
+    <strong>
+      Bazar UMKM
+    </strong>
+
+    <p>
+      Terbuka untuk Umum
+    </p>
+
+  </div>
+
+</div>
 
               {/* FREE + QUOTA */}
 
@@ -1174,7 +1337,7 @@ export default function RegisterPage() {
                       className="form-label"
                       htmlFor="email"
                     >
-                      Email *
+                      Email
                     </label>
 
                     <input
@@ -1188,7 +1351,6 @@ export default function RegisterPage() {
                           event.target.value
                         )
                       }
-                      required
                     />
 
                   </div>
@@ -1473,10 +1635,7 @@ export default function RegisterPage() {
                   </h3>
 
                   <p className="ticket-find-copy">
-                    Temukan kembali e-ticket
-                    Anda menggunakan alamat
-                    email yang sama saat
-                    pendaftaran.
+                    Temukan kembali e-ticket Anda menggunakan email atau nomor telepon yang sama saat pendaftaran.
                   </p>
 
                 </div>
