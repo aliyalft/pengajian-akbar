@@ -372,7 +372,7 @@ export default async function TicketVipPage({
                       </span>
 
                       <strong>
-                        Rabu, 23 September 2026
+                        Rabu, 30 September 2026
                       </strong>
 
                       <p>
