@@ -367,7 +367,7 @@ export default async function TicketPage({
                       </strong>
 
                       <p>
-                        13.00 – 17.45 WIB
+                        13.00 – 17.30 WIB
                       </p>
 
                     </div>
