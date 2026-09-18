@@ -1419,7 +1419,7 @@ setSubmitting(true);
 
 
               <h2 className="form-card-title">
-                Form Registrasi
+                Form Registrasi VIP
               </h2>
 
 
