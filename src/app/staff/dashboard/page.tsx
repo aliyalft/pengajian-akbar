@@ -24,7 +24,9 @@ type Registration = {
   email: string;
   gender: 'Ikhwan' | 'Akhwat';
   city: string;
-  institution: string | null;
+  jamaah_name: string | null;
+  jamaah_type: string | null;
+  gate: string | null;
   checked_in: boolean;
   checked_in_at: string | null;
   created_at: string;
@@ -114,12 +116,13 @@ export default function StaffDashboardPage() {
           ? '/api/stats-vip'
           : '/api/stats';
 
-      const response = await fetch(
-        endpoint,
-        {
-          cache: 'no-store',
-        }
-      );
+      const response =
+        await fetch(
+          endpoint,
+          {
+            cache: 'no-store',
+          }
+        );
 
       const data =
         await response.json();
@@ -284,7 +287,19 @@ export default function StaffDashboardPage() {
               .toLowerCase()
               .includes(keyword) ||
             (
-              registration.institution ??
+              registration.jamaah_name ??
+              ''
+            )
+              .toLowerCase()
+              .includes(keyword) ||
+            (
+              registration.jamaah_type ??
+              ''
+            )
+              .toLowerCase()
+              .includes(keyword) ||
+            (
+              registration.gate ??
               ''
             )
               .toLowerCase()
@@ -452,8 +467,16 @@ export default function StaffDashboardPage() {
           Domisili:
             registration.city,
 
+          'Tipe Jamaah':
+            registration.jamaah_type ||
+            '-',
+
           'Instansi / Komunitas':
-            registration.institution ||
+            registration.jamaah_name ||
+            '-',
+
+          Gate:
+            registration.gate ||
             '-',
 
           'Status Check-in':
@@ -503,7 +526,9 @@ export default function StaffDashboardPage() {
       { wch: 20 },
       { wch: 32 },
       { wch: 22 },
-      { wch: 30 },
+      { wch: 28 },
+      { wch: 20 },
+      { wch: 18 },
       { wch: 18 },
       { wch: 24 },
       { wch: 24 },
@@ -1026,7 +1051,15 @@ export default function StaffDashboardPage() {
                     </th>
 
                     <th>
+                      Tipe Jamaah
+                    </th>
+
+                    <th>
                       Instansi / Komunitas
+                    </th>
+
+                    <th>
+                      Gate
                     </th>
 
                     <th>
@@ -1108,7 +1141,23 @@ export default function StaffDashboardPage() {
 
                         <td>
                           {
-                            registration.institution ||
+                            registration.jamaah_type ||
+                            '—'
+                          }
+                        </td>
+
+
+                        <td>
+                          {
+                            registration.jamaah_name ||
+                            '—'
+                          }
+                        </td>
+
+
+                        <td>
+                          {
+                            registration.gate ||
                             '—'
                           }
                         </td>
