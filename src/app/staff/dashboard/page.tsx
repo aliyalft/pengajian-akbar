@@ -24,6 +24,7 @@ type Registration = {
   email: string;
   gender: 'Ikhwan' | 'Akhwat';
   city: string;
+  institution: string | null;
   jamaah_name: string | null;
   jamaah_type: string | null;
   gate: string | null;
@@ -287,6 +288,12 @@ export default function StaffDashboardPage() {
               .toLowerCase()
               .includes(keyword) ||
             (
+              registration.institution ??
+              ''
+            )
+              .toLowerCase()
+              .includes(keyword) ||
+            (
               registration.jamaah_name ??
               ''
             )
@@ -467,13 +474,21 @@ export default function StaffDashboardPage() {
           Domisili:
             registration.city,
 
-          'Tipe Jamaah':
-            registration.jamaah_type ||
-            '-',
+          ...(dashboardType === 'vip'
+            ? {
+                'Tipe Jamaah':
+                  registration.jamaah_type ||
+                  '-',
 
-          'Instansi / Komunitas':
-            registration.jamaah_name ||
-            '-',
+                'Nama Instansi / Komunitas':
+                  registration.jamaah_name ||
+                  '-',
+              }
+            : {
+                'Instansi / Komunitas':
+                  registration.institution ||
+                  '-',
+              }),
 
           Gate:
             registration.gate ||
@@ -519,20 +534,35 @@ export default function StaffDashboardPage() {
         : 'Data Jamaah'
     );
 
-    worksheet['!cols'] = [
-      { wch: 6 },
-      { wch: 28 },
-      { wch: 16 },
-      { wch: 20 },
-      { wch: 32 },
-      { wch: 22 },
-      { wch: 28 },
-      { wch: 20 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 24 },
-      { wch: 24 },
-    ];
+    worksheet['!cols'] =
+      dashboardType === 'vip'
+        ? [
+            { wch: 6 },
+            { wch: 28 },
+            { wch: 16 },
+            { wch: 20 },
+            { wch: 32 },
+            { wch: 22 },
+            { wch: 20 },
+            { wch: 28 },
+            { wch: 18 },
+            { wch: 18 },
+            { wch: 24 },
+            { wch: 24 },
+          ]
+        : [
+            { wch: 6 },
+            { wch: 28 },
+            { wch: 16 },
+            { wch: 20 },
+            { wch: 32 },
+            { wch: 22 },
+            { wch: 30 },
+            { wch: 18 },
+            { wch: 18 },
+            { wch: 24 },
+            { wch: 24 },
+          ];
 
     XLSX.writeFile(
       workbook,
@@ -1050,13 +1080,21 @@ export default function StaffDashboardPage() {
                       Domisili
                     </th>
 
-                    <th>
-                      Tipe Jamaah
-                    </th>
+                    {dashboardType === 'vip' ? (
+                      <>
+                        <th>
+                          Tipe Jamaah
+                        </th>
 
-                    <th>
-                      Instansi / Komunitas
-                    </th>
+                        <th>
+                          Nama Instansi / Komunitas
+                        </th>
+                      </>
+                    ) : (
+                      <th>
+                        Instansi / Komunitas
+                      </th>
+                    )}
 
                     <th>
                       Gate
@@ -1139,20 +1177,30 @@ export default function StaffDashboardPage() {
                         </td>
 
 
-                        <td>
-                          {
-                            registration.jamaah_type ||
-                            '—'
-                          }
-                        </td>
+                        {dashboardType === 'vip' ? (
+                          <>
+                            <td>
+                              {
+                                registration.jamaah_type ||
+                                '—'
+                              }
+                            </td>
 
-
-                        <td>
-                          {
-                            registration.jamaah_name ||
-                            '—'
-                          }
-                        </td>
+                            <td>
+                              {
+                                registration.jamaah_name ||
+                                '—'
+                              }
+                            </td>
+                          </>
+                        ) : (
+                          <td>
+                            {
+                              registration.institution ||
+                              '—'
+                            }
+                          </td>
+                        )}
 
 
                         <td>
