@@ -799,13 +799,31 @@ export default function RegisterPage() {
       </div>
     </div>
 
-
     <div className="event-talkshow-divider" />
 
 
     <div className="event-talkshow-item">
       <span className="event-talkshow-number">
         02
+      </span>
+
+      <div>
+        <strong>
+          Dr. Atalia Praratya, S.I.P., M.I.Kom.
+        </strong>
+
+        <p>
+          Anggota DPR RI
+        </p>
+      </div>
+    </div>
+
+    <div className="event-talkshow-divider" />
+
+
+    <div className="event-talkshow-item">
+      <span className="event-talkshow-number">
+        03
       </span>
 
       <div>
@@ -825,7 +843,7 @@ export default function RegisterPage() {
 
     <div className="event-talkshow-item">
       <span className="event-talkshow-number">
-        03
+        04
       </span>
 
       <div>

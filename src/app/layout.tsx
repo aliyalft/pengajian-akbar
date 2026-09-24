@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: '/image/posternew.png',
+        url: '/image/posterfix.png',
         width: 1200,
         height: 630,
         alt: 'Pengajian Akbar MT MHABD 2026',
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Pengajian Akbar MT MHABD 2026',
     description: 'Registrasi Pengajian Akbar MT MHABD 2026',
-    images: ['/image/posternew.png'],
+    images: ['/image/posterfix.png'],
   },
 };
 
