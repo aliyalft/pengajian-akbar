@@ -490,6 +490,27 @@ export default function RegisterPage() {
         />
       </div>
 
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-baznas1.png"
+          alt="Baznas"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-revlon.png"
+          alt="Revlon"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-hanan.png"
+          alt="Hanan"
+        />
+      </div>
+
       {/* DUPLICATE — untuk infinite loop */}
 
       <div className="register-partner-logo">
@@ -573,6 +594,27 @@ export default function RegisterPage() {
         <img
           src="/image/logo-kb.png"
           alt="Kolaborasi"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-baznas1.png"
+          alt="Baznas"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-revlon.png"
+          alt="Revlon"
+        />
+      </div>
+
+      <div className="register-partner-logo">
+        <img
+          src="/image/logo-hanan.png"
+          alt="Hanan"
         />
       </div>
 

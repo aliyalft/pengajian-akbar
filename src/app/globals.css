@@ -12999,3 +12999,10 @@ body {
   color: #9a722d;
   font-weight: 600;
 }
+
+.register-partner-logo-baznas img {
+  width: 200px !important;
+  height: 200px !important;
+  object-fit: contain;
+  transform: scale(1.5);
+}
