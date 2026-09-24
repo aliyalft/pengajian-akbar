@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
             gender,
             city,
             institution,
+            gate,
             checked_in,
             checked_in_at,
             created_at
