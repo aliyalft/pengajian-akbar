@@ -109,7 +109,7 @@ export default function NotFound() {
 
   <div className="notfound-poster">
     <img
-      src="/image/posterfix.png"
+      src="/image/poster2.png"
       alt="Poster Pengajian Akbar MT MHABD"
     />
   </div>
