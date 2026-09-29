@@ -84,6 +84,27 @@ export default function ScannerPage() {
   const [scanLocked, setScanLocked] =
     useState(false);
 
+  type LiveScanFeedback =
+    | {
+        status: 'success';
+        title: string;
+        name: string;
+      }
+    | {
+        status: 'already_checked_in';
+        title: string;
+        name: string;
+      }
+    | {
+        status: 'error';
+        title: string;
+        message: string;
+      }
+    | null;
+
+  const [liveScanFeedback, setLiveScanFeedback] =
+    useState<LiveScanFeedback>(null);
+
   const [showHelp, setShowHelp] =
     useState(false);
 
@@ -448,6 +469,33 @@ export default function ScannerPage() {
       );
 
       // =====================================================
+      // FEEDBACK SINGKAT DI ATAS SCANNER
+      // =====================================================
+
+      if (
+        scanResult.status ===
+        'success'
+      ) {
+        setLiveScanFeedback({
+          status: 'success',
+          title: 'Check-in Berhasil',
+          name:
+            scanResult
+              .registration
+              .full_name,
+        });
+      } else {
+        setLiveScanFeedback({
+          status: 'already_checked_in',
+          title: 'Sudah Pernah Check-in',
+          name:
+            scanResult
+              .registration
+              .full_name,
+        });
+      }
+
+      // =====================================================
       // TAMBAHKAN HASIL KE HISTORY
       // =====================================================
 
@@ -558,6 +606,12 @@ export default function ScannerPage() {
         message
       );
 
+      setLiveScanFeedback({
+        status: 'error',
+        title: 'Check-in Gagal',
+        message,
+      });
+
       const errorHistoryItem: ScanHistoryItem =
         {
           id:
@@ -606,6 +660,7 @@ export default function ScannerPage() {
       window.setTimeout(
         () => {
           setScanLocked(false);
+          setLiveScanFeedback(null);
         },
         2500
       );
@@ -822,11 +877,69 @@ export default function ScannerPage() {
               ACTUAL QR SCANNER
           ================================================= */}
 
-          <Html5QrScanner
-            onScanSuccess={
-              handleScanSuccess
-            }
-          />
+          <div className="scanner-live-wrap">
+
+            <Html5QrScanner
+              onScanSuccess={
+                handleScanSuccess
+              }
+            />
+
+            {liveScanFeedback && (
+              <div
+                className={`scanner-live-feedback scanner-live-feedback-${liveScanFeedback.status}`}
+                role="status"
+                aria-live="polite"
+              >
+
+                <span className="scanner-live-feedback-icon">
+                  {liveScanFeedback.status ===
+                  'error' ? (
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M7 7L17 17M17 7L7 17"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M6.5 12.5L10.2 16L17.5 8.5"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </span>
+
+                <span className="scanner-live-feedback-copy">
+                  <strong>
+                    {liveScanFeedback.title}
+                  </strong>
+
+                  <small>
+                    {'name' in liveScanFeedback
+                      ? liveScanFeedback.name
+                      : liveScanFeedback.message}
+                  </small>
+                </span>
+
+              </div>
+            )}
+
+          </div>
 
           {/* =================================================
               PROCESSING
