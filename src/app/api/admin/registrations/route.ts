@@ -209,20 +209,41 @@ export async function DELETE(
         .delete()
         .eq('id', id)
         .select('id, full_name')
-        .single();
+        .maybeSingle();
 
     if (error) {
       console.error(
         'Delete registration error:',
-        error
+        {
+          table,
+          id,
+          error,
+        }
       );
 
       return NextResponse.json(
         {
-          error: 'Gagal menghapus data peserta.',
+          error: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
         },
         {
           status: 500,
+        }
+      );
+    }
+
+    if (!data) {
+      return NextResponse.json(
+        {
+          error:
+            'Data peserta tidak ditemukan atau sudah terhapus.',
+          table,
+          id,
+        },
+        {
+          status: 404,
         }
       );
     }
@@ -239,7 +260,10 @@ export async function DELETE(
 
     return NextResponse.json(
       {
-        error: 'Terjadi kesalahan pada server.',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Terjadi kesalahan pada server.',
       },
       {
         status: 500,

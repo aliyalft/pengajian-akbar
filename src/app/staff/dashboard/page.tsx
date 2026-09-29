@@ -275,39 +275,43 @@ export default function StaffDashboardPage() {
 
           const matchesSearch =
             keyword.length === 0 ||
-            registration.full_name
-              .toLowerCase()
-              .includes(keyword) ||
-            registration.email
-              .toLowerCase()
-              .includes(keyword) ||
-            registration.phone_number
-              .toLowerCase()
-              .includes(keyword) ||
-            registration.city
-              .toLowerCase()
-              .includes(keyword) ||
-            (
-              registration.institution ??
-              ''
+            String(
+              registration.full_name ?? ''
             )
               .toLowerCase()
               .includes(keyword) ||
-            (
-              registration.jamaah_name ??
-              ''
+            String(
+              registration.email ?? ''
             )
               .toLowerCase()
               .includes(keyword) ||
-            (
-              registration.jamaah_type ??
-              ''
+            String(
+              registration.phone_number ?? ''
             )
               .toLowerCase()
               .includes(keyword) ||
-            (
-              registration.gate ??
-              ''
+            String(
+              registration.city ?? ''
+            )
+              .toLowerCase()
+              .includes(keyword) ||
+            String(
+              registration.institution ?? ''
+            )
+              .toLowerCase()
+              .includes(keyword) ||
+            String(
+              registration.jamaah_name ?? ''
+            )
+              .toLowerCase()
+              .includes(keyword) ||
+            String(
+              registration.jamaah_type ?? ''
+            )
+              .toLowerCase()
+              .includes(keyword) ||
+            String(
+              registration.gate ?? ''
             )
               .toLowerCase()
               .includes(keyword);
@@ -352,89 +356,68 @@ export default function StaffDashboardPage() {
   ========================================= */
 
   const handleDelete = async (
-    registration: Registration
-  ) => {
+  registration: Registration
+) => {
+  const confirmed = window.confirm(
+    `Hapus data "${registration.full_name}"?\n\nData yang sudah dihapus tidak dapat dikembalikan.`
+  );
 
-    const confirmed =
-      window.confirm(
-        `Hapus data "${registration.full_name}"?\n\nData yang sudah dihapus tidak dapat dikembalikan.`
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    setDeletingId(registration.id);
+
+    const endpoint =
+      dashboardType === 'vip'
+        ? '/api/admin/registrations-vip'
+        : '/api/admin/registrations';
+
+    const response = await fetch(endpoint, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: registration.id,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          'Gagal menghapus peserta.'
       );
-
-    if (!confirmed) {
-      return;
     }
 
-    try {
+    // Hapus langsung dari tabel tanpa perlu reload
+    setRegistrations((current) =>
+      current.filter(
+        (item) => item.id !== registration.id
+      )
+    );
 
-      setDeletingId(
-        registration.id
-      );
+    // Refresh statistik
+    await loadStats();
 
-      const endpoint =
-        dashboardType === 'vip'
-          ? '/api/admin/registrations-vip'
-          : '/api/admin/registrations';
+  } catch (error) {
+    console.error(
+      'Delete registration error:',
+      error
+    );
 
-      const response =
-        await fetch(
-          endpoint,
-          {
-            method: 'DELETE',
-
-            headers: {
-              'Content-Type':
-                'application/json',
-            },
-
-            body: JSON.stringify({
-              id: registration.id,
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-
-        throw new Error(
-          data.error ||
-            'Gagal menghapus peserta.'
-        );
-
-      }
-
-      setRegistrations(
-        (current) =>
-          current.filter(
-            (item) =>
-              item.id !==
-              registration.id
-          )
-      );
-
-      await loadStats();
-
-    } catch (error) {
-
-      console.error(
-        'Delete registration error:',
-        error
-      );
-
-      window.alert(
-        error instanceof Error
-          ? error.message
-          : 'Gagal menghapus peserta.'
-      );
-
-    } finally {
-
-      setDeletingId(null);
-
-    }
-
-  };
+    window.alert(
+      error instanceof Error
+        ? error.message
+        : 'Gagal menghapus peserta.'
+    );
+  } finally {
+    setDeletingId(null);
+  }
+};
 
 
   /* =========================================

@@ -12,6 +12,7 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
+
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
@@ -19,9 +20,15 @@ export async function updateSession(request: NextRequest) {
 
           response = NextResponse.next({ request });
 
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
+          cookiesToSet.forEach(
+            ({ name, value, options }) => {
+              response.cookies.set(
+                name,
+                value,
+                options
+              );
+            }
+          );
         },
       },
     }
@@ -33,26 +40,44 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  const isStaffRoute =
-    pathname.startsWith('/staff') &&
-    !pathname.startsWith('/staff/login');
+  /*
+   * Hanya Dashboard yang membutuhkan login.
+   *
+   * Scanner bersifat public.
+   */
+  const isDashboardRoute =
+    pathname.startsWith('/staff/dashboard');
 
-  if (!user && isStaffRoute) {
+  /*
+   * Jika belum login lalu membuka Dashboard,
+   * arahkan ke login.
+   */
+  if (!user && isDashboardRoute) {
     const url = request.nextUrl.clone();
 
     url.pathname = '/staff/login';
-
-    if (pathname === '/staff/dashboard') {
-      url.searchParams.set('from', 'dashboard');
-    } else if (pathname === '/staff/scanner') {
-      url.searchParams.set('from', 'scanner');
-    }
+    url.searchParams.set(
+      'from',
+      'dashboard'
+    );
 
     return NextResponse.redirect(url);
   }
 
-  if (user && pathname === '/staff/login') {
-    const from = request.nextUrl.searchParams.get('from');
+  /*
+   * Jika user sudah login lalu membuka halaman login,
+   * arahkan ke Dashboard.
+   *
+   * Scanner tidak ikut dilindungi auth.
+   */
+  if (
+    user &&
+    pathname === '/staff/login'
+  ) {
+    const from =
+      request.nextUrl.searchParams.get(
+        'from'
+      );
 
     const url = request.nextUrl.clone();
 
